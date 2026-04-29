@@ -5264,21 +5264,171 @@ plot_grid(cand_reg_fst + labs(x = NULL),
 ![alt text](image-124.png)
 
 <br>
+<br>
+
+There also appears to be a region of elevated Fst in **Chromosome NC_089315**, so let's take a closer look at that chromosome too:
+```r
+ofu_fst_outliers_q999 %>% 
+  select(comparison, chromosome, window_pos_1, window_pos_2, window_id, avg_hudson_fst, no_snps) %>% 
+  filter(chromosome == "NC_089315.1") %>%
+  arrange(window_pos_1)
+
+c15_outlier_windows <- ofu_fst_outliers_q999 %>% 
+  select(comparison, chromosome, window_pos_1, window_pos_2, window_id, avg_hudson_fst, no_snps) %>% 
+  filter(chromosome == "NC_089315.1") %>%
+  arrange(window_pos_1) %>% 
+  pull(window_pos_1)
+```
+```
+  comparison chromosome  window_pos_1 window_pos_2 window_id                     avg_hudson_fst no_snps
+  <fct>      <fct>              <dbl>        <dbl> <chr>                                  <dbl>   <dbl>
+1 OFU3_OFU6  NC_089315.1      1740001      1750000 NC_089315.1_1740001_1750000            0.326      65
+2 OFU3_OFU6  NC_089315.1     21190001     21200000 NC_089315.1_21190001_21200000          0.387      59
+3 OFU3_OFU6  NC_089315.1     21220001     21230000 NC_089315.1_21220001_21230000          0.404      30
+4 OFU3_OFU6  NC_089315.1     21230001     21240000 NC_089315.1_21230001_21240000          0.312     135
+5 OFU3_OFU6  NC_089315.1     21600001     21610000 NC_089315.1_21600001_21610000          0.315     117
+6 OFU3_OFU6  NC_089315.1     21610001     21620000 NC_089315.1_21610001_21620000          0.339     118
+7 OFU3_OFU6  NC_089315.1     24370001     24380000 NC_089315.1_24370001_24380000          0.298      37
+8 OFU3_OFU6  NC_089315.1     24380001     24390000 NC_089315.1_24380001_24390000          0.271      96
+```
+
+
+```r
+# create new column that indicates the 4 candidate windows
+cand_windows_c15 <- ofu36_all_metrics %>% 
+  mutate(
+    candidate = chromosome == "NC_089315.1" &
+      window_pos_1 %in% c15_outlier_windows
+  ) %>% 
+  filter(chromosome == "NC_089315.1")
+
+head(cand_windows_c15, 10)
+```
+```
+   pop1  pop2  chromosome  window_pos_1 window_pos_2 window_id comparison no_snps avg_hudson_fst avg_pi_OFU3 no_sites_pi_OFU3 avg_pi_OFU6 no_sites_pi_OFU6 avg_dxy no_sites_dxy tajima_d_OFU3 no_sites_tajimad_OFU3 tajima_d_OFU6 no_sites_tajimad_OFU6 delta_pi delta_td candidate
+   <fct> <fct> <fct>              <dbl>        <dbl> <chr>     <fct>        <dbl>          <dbl>       <dbl>            <dbl>       <dbl>            <dbl>   <dbl>        <dbl>         <dbl>                 <dbl>         <dbl>                 <dbl>    <dbl>    <dbl> <lgl>    
+ 1 OFU3  OFU6  NC_089315.1     21220001     21230000 NC_08931… OFU3_OFU6       30          0.404    0.00100              7428    0.000691             7428 0.00142         7428        0.841                   7428        -1.40                   7428  3.12e-4    2.24  TRUE     
+ 2 OFU3  OFU6  NC_089315.1     21190001     21200000 NC_08931… OFU3_OFU6       59          0.387    0.00144              9019    0.00164              9019 0.00251         9019        0.215                   9019        -0.648                  9019 -1.98e-4    0.863 TRUE     
+ 3 OFU3  OFU6  NC_089315.1     21610001     21620000 NC_08931… OFU3_OFU6      118          0.339    0.00364              9369    0.00267              9369 0.00478         9369        1.29                    9369        -0.549                  9369  9.67e-4    1.84  TRUE     
+ 4 OFU3  OFU6  NC_089315.1      1740001      1750000 NC_08931… OFU3_OFU6       65          0.326    0.000997             7658    0.00140              7658 0.00179         7658       -1.37                    7658         0.251                  7658 -4.08e-4   -1.63  TRUE     
+ 5 OFU3  OFU6  NC_089315.1     21600001     21610000 NC_08931… OFU3_OFU6      117          0.315    0.00361              9621    0.00256              9621 0.00450         9621        0.733                   9621        -1.17                   9621  1.06e-3    1.90  TRUE     
+ 6 OFU3  OFU6  NC_089315.1     21230001     21240000 NC_08931… OFU3_OFU6      135          0.312    0.00438              8346    0.00369              8346 0.00586         8346        0.807                   8346        -0.485                  8346  6.87e-4    1.29  TRUE     
+ 7 OFU3  OFU6  NC_089315.1     24370001     24380000 NC_08931… OFU3_OFU6       37          0.298    0.00127              8171    0.000677             8171 0.00138         8171        1.29                    8171        -1.36                   8171  5.90e-4    2.65  TRUE     
+ 8 OFU3  OFU6  NC_089315.1     24380001     24390000 NC_08931… OFU3_OFU6       96          0.271    0.00288              8348    0.00160              8348 0.00307         8348       -0.413                   8348        -1.83                   8348  1.28e-3    1.41  TRUE     
+ 9 OFU3  OFU6  NC_089315.1     21240001     21250000 NC_08931… OFU3_OFU6      106          0.237    0.00316              8483    0.00241              8483 0.00365         8483        0.199                   8483        -1.04                   8483  7.48e-4    1.24  FALSE    
+10 OFU3  OFU6  NC_089315.1     21250001     21260000 NC_08931… OFU3_OFU6       94          0.227    0.00250              8050    0.00241              8050 0.00317         8050       -0.0891                  8050        -0.759                  8050  9.32e-5    0.670 FALSE  
+```
+There are three q999 windows within a 40kb region (plus two more contiguous windows immediately following with Fst just below the q999 cutoff but >0.220), and five q999 windows within a 430kb region
+
+<br>
+
+```r
+# plot fst
+c15_cand_fst <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
+  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot delta_pi
+c15_cand_deltapi <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = delta_pi)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Δπ"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot delta_td
+c15_cand_deltatd <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = delta_td)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Δ Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot dxy
+c15_cand_dxy <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = avg_dxy)) +
+  geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Dxy"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+# combine plots
+plot_grid(c15_cand_fst + labs(x = NULL),
+          c15_cand_deltapi + labs(x = NULL),
+          c15_cand_deltatd + labs(x = NULL),
+          c15_cand_dxy,
+          ncol = 1,
+          align = "v",
+          axis = "lr"
+)
+```
+![alt text](image-126.png)
+
+<br>
+
+```r
+# plot fst vs. dxy
+ggplot(cand_windows_c15, aes(x = avg_dxy, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
+  geom_text_repel(data = cand_windows_c15 %>% filter(candidate | window_pos_1 %in% c(21240001, 21250001)), aes(label = window_pos_1), color = "red", alpha = 1, size = 3) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Average Dxy",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+![alt text](image-127.png)
+
+
+<br>
+
 Rough summary of OFU3 and OFU6:
 
 <br>
 
-OFU3 appears to be the more strongly filtered and differentiated of the two Ofu pools. Relative to Tutuila, it shows the clearest shift in allele frequencies, with the highest mean pairwise FST and elevated Dxy, but it does not stand out as especially diversity-rich within site; instead, its comparatively low θ and only moderate π are more consistent with a narrower subset of variants being retained under the extreme conditions of Pool 300. At the same time, the data do not support a strong genome-wide selective sweep or broad genome-wide directional selection at OFU3. Rather, most of the genome still fits a shallow-divergence, shared-variation background, while a limited number of localized windows stand out as candidate regions of stronger divergence, including a small cluster of adjacent high-FST windows between OFU3 and OFU6. Taken together, this suggests that OFU3 is best interpreted as a locally distinctive population shaped by environmental filtering and selection at particular parts of the genome, rather than by genome-wide isolation.
+OFU3 appears to be the more strongly filtered and differentiated of the two Ofu pools. Relative to Tutuila, it shows the clearest shift in allele frequencies, with the highest mean pairwise FST and elevated Dxy, but it does not stand out as especially diversity-rich within site. Instead, its comparatively low θ and only moderate π are more consistent with a narrower subset of variants being retained under the extreme conditions of Pool 300. At the same time, the data do not support a strong genome-wide selective sweep or broad genome-wide directional selection at OFU3. Rather, most of the genome still fits a shallow-divergence, shared-variation background, while a limited number of localized windows stand out as candidate regions of stronger divergence, including a small cluster of adjacent high-FST windows between OFU3 and OFU6. Taken together, this suggests that OFU3 is best interpreted as a locally distinctive population shaped by environmental filtering and selection at particular parts of the genome, rather than by genome-wide isolation.
 
 <br>
 
-OFU6 shows the opposite pattern. It has the highest π and θ and the most negative Tajima’s D of all locations, indicating unusually high standing variation together with an excess of rare alleles, yet it remains only weakly differentiated from Tutuila by FST even though OFU6–Tutuila Dxy is often higher than among Tutuila-only comparisons. Accordingly, OFU6 looks less like an independently diverged population and more like a diversity-retaining population that remains connected to the broader regional gene pool. One plausible explanation is that OFU6 receives shared propagules from Tutuila while also exchanging alleles with nearby OFU3; in that scenario, OFU3-associated alleles may contribute to elevated absolute divergence in OFU6 without driving the same strong relative differentiation, because those alleles are not sorted or filtered in OFU6 to the same extent. OFU6 shows little evidence for strong genome-wide directional selection, and the dominant pattern is instead one of elevated standing variation and rare alleles.
+OFU6 shows the opposite pattern. It has the highest π and θ and the most negative Tajima’s D of all locations, indicating unusually high standing variation together with an excess of rare alleles, yet it remains only weakly differentiated from Tutuila by FST even though OFU6–Tutuila Dxy is often higher than among Tutuila-only comparisons. Accordingly, OFU6 looks less like an independently diverged population and more like a diversity-retaining population that remains connected to the broader regional gene pool. One plausible explanation is that OFU6 receives shared propagules from Tutuila while also exchanging alleles with nearby OFU3; in that scenario, OFU3-associated alleles may contribute to elevated absolute divergence in OFU6 without driving the same strong relative differentiation, because those alleles are not sorted or filtered in OFU6 to the same extent. OFU6 shows little evidence for strong genome-wide directional selection, and the dominant pattern is instead one of elevated standing variation and rare alleles, with a few localized candidate regions for directional selection.
 
 <br>
 
 General summary across all popgen results:
-- π is similar across islands/sites → no major genome-wide loss of diversity
-- Dxy ≈ π and low FST → shallow divergence/shared variation/gene flow
+- π is similar across islands/sites -> no major genome-wide loss of diversity
+- Dxy ≈ π (Dxy slightly greater) and low FST -> shallow divergence/shared variation/gene flow
 - Ofu has higher θ and more negative Tajima’s D, indicating rare-allele enrichment / nonequilibrium dynamics
 - FTEL has lower θ and more neutral Tajima’s D, indicating potentially more stable/differentiated genomic background
-- differentiation is weak but nonzero → enough structure to matter, not enough to imply isolation
+- differentiation is weak but nonzero -> enough structure to be detectable, but not enough to imply isolation
+- A few promising candidate regions for selection across OFU3/OFU6 comparison; especially on chromosomes NC_089312 and NC_089315
