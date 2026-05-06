@@ -5432,3 +5432,45 @@ General summary across all popgen results:
 - FTEL has lower θ and more neutral Tajima’s D, indicating potentially more stable/differentiated genomic background
 - differentiation is weak but nonzero -> enough structure to be detectable, but not enough to imply isolation
 - A few promising candidate regions for selection across OFU3/OFU6 comparison; especially on chromosomes NC_089312 and NC_089315
+
+
+<br>
+
+<br>
+
+### Investigating candidate regions
+
+OFU3 candidate region NC_089312.1:34680001-34720000 :
+  - There are two annotated genes within this region, both on the minus strand:
+    - NC_089312.1:34679212-34697834	-	chitin synthase chs-2
+    - NC_089312.1:34699535-34715212 - uncharacterized LOC131784753
+
+<br>
+
+A blast of the transcript sequence returns other uncharacterized proteins from other Pocillopora species:
+```
+Description ScientificName MaxScore TotalScore QueryCover Evalue Per.Ident Acc.Len Accession
+
+PREDICTED: Pocillopora verrucosa uncharacterized protein (LOC131784753), mRNA	Pocillopora verrucosa	8283	8283	100%	0.0	100.00%	4485	XM_066174378.1
+PREDICTED: Pocillopora damicornis uncharacterized LOC113680748 (LOC113680748), mRNA	Pocillopora damicornis	7736	7736	99%	0.0	98.20%	4441	XM_027197783.1
+Pocillopora grandis genome assembly, chromosome: 2	Pocillopora grandis	1592	10705	100%	0.0	99.43%	35508022	OZ034732.1
+Pocillopora damicornis genome assembly, chromosome: 2	Pocillopora damicornis	1543	10359	99%	0.0	98.41%	37914753	OZ123162.1
+```
+
+<br>
+
+A blast of the protein sequence returns many more hits, mostly from other corals, but also some other invertebrates. They are all uncharacterized/hypothesized/unnamed proteins/products or proteins similar to chitin synthases, e.g.,:
+```
+Description Scientific Name MaxScore TotalScore QueryCover Evalue Per.Ident Acc.Len Accession
+
+Chitin synthase 1 [Stylophora pistillata]	Stylophora pistillata	1238	1238	91%	0.0	51.18%	1349	PFX17869.1
+```
+
+Importantly, the chitin synthase chs-2 gene next to it is also one of the hits:
+```
+chitin synthase chs-2 [Pocillopora verrucosa]	Pocillopora verrucosa	1270	1270	99%	0.0	49.30%	1437	XP_066030086.1
+```
+
+So it is likely part of the chitin synthase-like gene family or a domain-sharing protein.
+
+Chitin synthase in corals is most likely involved in skeletogenesis and biomineralization. Chitin is a structural polysaccharide that is thought to contribute to the skeletal organic matrix at the tissue–skeleton interface. A plausible hypothesis is that variation in chitin synthase-like genes could influence skeletal organic matrix formation and thereby alter how colonies maintain calcification or structural integrity under the repeated exposure to extreme and fluctuating temperatures in OFU3.
