@@ -5497,8 +5497,12 @@ ggplot(FTEL_ALOF_comp, aes(x = window_pos_1, y = avg_hudson_fst)) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+OFU3 vs OFU6
 ![alt text](image-113.png)
-Some notable peaks among otherwise low baseline divergence.
+
+FTEL vs ALOF
+![alt text](image-128.png)
+Again, low baseline divergence with some notable peaks.
 
 <br>
 
