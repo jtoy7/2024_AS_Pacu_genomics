@@ -5497,7 +5497,7 @@ ggplot(FTEL_ALOF_comp, aes(x = window_pos_1, y = avg_hudson_fst)) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-OFU3 vs OFU6
+OFU3 vs OFU6 (for comparison)
 ![alt text](image-113.png)
 
 FTEL vs ALOF
@@ -5508,7 +5508,7 @@ Again, low baseline divergence with some notable peaks.
 
 ```r
 # summarize genome-wide weighted Fst for this comparison
-ofu_fst_summary <- ofu_comp %>%
+FTEL_ALOF_fst_summary <- FTEL_ALOF_comp %>%
   summarise(
     w_mean = weighted.mean(avg_hudson_fst, no_snps, na.rm = TRUE),
     median = median(avg_hudson_fst, na.rm = TRUE),
@@ -5518,13 +5518,16 @@ ofu_fst_summary <- ofu_comp %>%
     n_windows = n()
   )
 
-ofu_fst_summary
+FTEL_ALOF_fst_summary
 ```
 ```
   w_mean  median   q95   q99   max n_windows
   0.0144 0.00395 0.103 0.169 0.566     16566
+  w_mean median    q95   q99   max n_windows
+  0.0222 0.0148 0.0890 0.148 0.293     16566
 ```
 
+CONTINUE HERE (2026-06-18_1655)
 <br>
 
 ```r
