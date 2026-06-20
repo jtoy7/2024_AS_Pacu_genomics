@@ -5564,8 +5564,10 @@ General summary across all popgen results:
 
 #### OFU3 candidate region NC_089312.1:34680001-34720000 :
   - There are two annotated genes within this region, both on the minus strand:
-    - NC_089312.1:34679212-34697834	-	chitin synthase chs-2
-    - NC_089312.1:34699535-34715212 - uncharacterized LOC131784753
+```
+NC_089312.1:34679212-34697834 - chitin synthase chs-2
+NC_089312.1:34699535-34715212 - uncharacterized LOC131784753
+```
 
 <br>
 
@@ -5601,11 +5603,13 @@ Chitin synthase in corals is most likely involved in skeletogenesis and biominer
 
 #### OFU3 candidate region NC_089315.1_1740001_1750000 :
 - There are three annotated features within this region, one on the plus strand and two on the minus strand:
-  - NC_089315.1:1737447-1741768	- uncharacterized LOC131772635 (minus strand)
-  - NC_089315.1:1741808-1744117	- mitochondrial import inner membrane translocase subunit TIM14-like (plus strand)
-  - NC_089315.1:1744087-1755851	- putative helicase MOV-10 (minus strand)
+```
+NC_089315.1:1737447-1741768	- uncharacterized LOC131772635 (minus strand)
+NC_089315.1:1741808-1744117	- mitochondrial import inner membrane translocase subunit TIM14-like (plus strand)
+NC_089315.1:1744087-1755851	- putative helicase MOV-10 (minus strand)
+```
 
-Interestingly, TIM14 is also known as DnaJ Heat Shock Protein Family (Hsp40) Member C19 (DNAJC19), a DnaJ heat shock protein that functions in the import of transit peptide-containing proteins into the mitochondrial matrix.
+Interestingly, `TIM14` is also known as `DnaJ Heat Shock Protein Family (Hsp40) Member C19 (DNAJC19)`, a DnaJ heat shock protein that functions in the import of transit peptide-containing proteins into the mitochondrial matrix.
 
 A blast of the TIM14-like protein sequence returns the following top hits:
 ```
@@ -5645,11 +5649,11 @@ Cluster Composition	Cluster Ancestor	Representative sequence	Max Score	Total Sco
 1 member(s) 1 organism(s)	soft corals	clathrin light chain A-like [Dendronephthya gigantea]	45.8	45.8	57%	0.007	47.06	202	XP_028394753.1
 2 member(s) 1 organism(s)	stony corals	putative helicase MOV-10 [Stylophora pistillata]	44.3	44.3	32%	0.036	61.11	954	PFX17671.1
 ```
-Clathrin light chain A is a regulatory component of the clathrin coat that helps organize coated pits and vesicles during receptor-mediated endocytosis.
+`Clathrin light chain A` is a regulatory component of the clathrin coat that helps organize coated pits and vesicles during receptor-mediated endocytosis.
 
 <br>
 
-A blast of the putative helicase MOV-10 protein sequence returns many putative MOV10 homologs, though none look like perfect 1:1 orthologs (highest identity is 74% with full coverage of the gene)
+A blast of the `putative helicase MOV-10` protein sequence returns many putative MOV-10 homologs, though none look like perfect 1:1 orthologs (highest identity is 74% with full coverage of the gene)
 ```
 Cluster Composition	Cluster Ancestor	Representative sequence	Max Score	Total Score	Query Cover	E value	Per. ident	Acc. Len	Accession  	
 2 member(s) 1 organism(s)	stony corals	hypothetical protein ACROYT_G003129 [Oculina patagonica]	1499	1499	100%	0	73.53	1011	KAL9988657.1	
@@ -5670,21 +5674,29 @@ Cluster Composition	Cluster Ancestor	Representative sequence	Max Score	Total Sco
 2 member(s) 2 organism(s)	stony corals	putative helicase mov-10-B.1 isoform X2 [Porites lutea]	1037	1037	69%	0	73.37	709	XP_073243084.1	
 1 member(s) 1 organism(s)	stony corals	Helicase MOV-10 [Desmophyllum pertusum]	943	943	66%	0	70.27	660	KAJ7370129.1	
 ```
-MOV10 is an RNA helicase involved in post-transcriptional RNA regulation, RNA-protein complex remodeling, mRNA turnover/silencing, and defense against mobile or viral genetic elements.
+`MOV-10` is an RNA helicase involved in post-transcriptional RNA regulation, RNA-protein complex remodeling, mRNA turnover/silencing, and defense against mobile or viral genetic elements.
 
 <br>
 <br>
 
 #### OFU6 candidate region NC_089315.1_21190001-21260000 :
 - There are 6 annotated genes within this region, both on the minus strand:
-    - NC_089315.1:21185958-21197996 - leucine-rich repeat-containing protein 49
-    - NC_089315.1:21207514-21213867 - tetraspanin-36-like
-    - NC_089315.1:21229902-21244360 - synergin gamma
-    - NC_089315.1:21244865-21246511 - centromere protein W
-    - NC_089315.1:21246093-21250678 - uncharacterized LOC131773099
-    - NC_089315.1:21250817-21263136 - mitochondrial-processing peptidase subunit alpha-like
+```
+NC_089315.1:21185958-21197996 (minus) - leucine-rich repeat-containing protein 49 
+NC_089315.1:21207514-21213867 (plus)  - tetraspanin-36-like 
+NC_089315.1:21229902-21244360 (plus)  - synergin gamma (plus)
+NC_089315.1:21244865-21246511 (minus) - centromere protein W 
+NC_089315.1:21246093-21250678 (plus)  - uncharacterized LOC131773099
+NC_089315.1:21250817-21263136 (plus)  - mitochondrial-processing peptidase subunit alpha-like
+```
+A blast of the protein sequence of the uncharacterized LOC returns other uncharacterized proteins with no clear named gene.
 
-A blast of the transcript sequence returns other uncharacterized proteins from other Pocillopora species:
+These genes are genearlly realted to **membrane organization**, **vesicle trafficking**, and **mitochondrial protein processing**:
+- LRRC49 encodes **leucine-rich repeat-containing protein 49**, a molecular adaptor associated with the tubulin polyglutamylase complex. It is localized to the centriolar satellite and is also found in the cytoplasm and cytoskeleton, placing it in compartments that support cytoskeletal organization. LRRC49 is linked to microtubule cytoskeleton organization, microtubule polymerization, and cilium disassembly, consistent with a role in processes that depend on centriole- and microtubule-based structures. Its localization to centriolar satellite provides cellular context for this adaptor activity, and the protein is annotated in pathways broadly related to metabolism of proteins (GeneCards).
+- tspan36 encodes a **tetraspanin** membrane protein localized to the plasma membrane and implicated in cell adhesion and signaling pathways (Xenbase). In zebrafish, it Plays a role in migration and segregation of pigment cells (melanophores and xanthophores; UniProt)
+- SYNRG encodes **synergin gamma**, a binding protein that interacts with the gamma subunit of the AP1 clathrin-adaptor complex and helps connect AP1 to other proteins. AP1 is located at the trans-Golgi network and associates specific proteins with clathrin-coated vesicles, placing SYNRG in the machinery that organizes vesicle trafficking (Genecards).
+- CENPW encodes **Centromere Protein W**, a core kinetochore assembly factor required for accurate chromosome segregation and mitotic progression. It is an essential component of the CENPA-NAC and CENP-T-W-S-X complexes, which bind H3-containing centromeric nucleosomes and supercoil DNA to enable kinetochore formation. Through this role, CENPW helps build the inner kinetochore and supports cell cycle progression (GeneCards).
+- PMPCA encodes the **alpha subunit of the mitochondrial processing peptidase**, a metallopeptidase that cleaves transit peptides from nuclear-encoded mitochondrial proteins. It functions in the mitochondrion as part of a proteolytic heterodimer and is central to mitochondrial protein processing and localization. Mechanistically, PMPCA participates in proteolysis and protein processing during import of mitochondrial precursors, thereby supporting the maturation of proteins targeted to the mitochondrion. Its involvement is also linked to transport of small molecules, protein localization, and metabolism of proteins (GeneCards). 
 
 
 <br>
