@@ -5294,7 +5294,7 @@ c15_outlier_windows <- ofu_fst_outliers_q999 %>%
 
 
 ```r
-# create new column that indicates the 4 candidate windows
+# create new column that indicates the candidate windows
 cand_windows_c15 <- ofu36_all_metrics %>% 
   mutate(
     candidate = chromosome == "NC_089315.1" &
@@ -5389,7 +5389,7 @@ plot_grid(c15_cand_fst + labs(x = NULL),
           axis = "lr"
 )
 ```
-![alt text](image-126.png)
+![alt text](image-129.png)
 
 <br>
 
@@ -5410,6 +5410,128 @@ ggplot(cand_windows_c15, aes(x = avg_dxy, y = avg_hudson_fst)) +
 ```
 ![alt text](image-127.png)
 
+<br>
+<br>
+
+Let's also look at the top Fst candidate, even though it's a single 10kb window on chromosome NC_089313:
+```r
+# show all outlier windows on this chromosome
+ofu_fst_outliers_q999 %>% 
+  select(comparison, chromosome, window_pos_1, window_pos_2, window_id, avg_hudson_fst, no_snps) %>% 
+  filter(chromosome == "NC_089313.1")
+```
+```
+comparison chromosome  window_pos_1 window_pos_2 window_id                     avg_hudson_fst no_snps
+OFU3_OFU6  NC_089313.1      3680001      3690000 NC_089313.1_3680001_3690000            0.566      32
+OFU3_OFU6  NC_089313.1     17880001     17890000 NC_089313.1_17880001_17890000          0.280      53
+```
+
+```r
+# create new column that indicates the candidate window
+cand_windows_c13 <- ofu36_all_metrics %>% 
+  mutate(
+    candidate = chromosome == "NC_089313.1" &
+      window_pos_1 == 3680001
+  ) %>% 
+  filter(chromosome == "NC_089313.1")
+
+
+
+# plot fst
+c13_cand_fst <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot delta_pi
+c13_cand_deltapi <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = delta_pi)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Δπ"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot delta_td
+c13_cand_deltatd <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = delta_td)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Δ Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot tajima's D for OFU6
+c13_cand_tdOFU6 <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = tajima_d_OFU6)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "OFU6 Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot dxy
+c13_cand_dxy <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = avg_dxy)) +
+  geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Dxy"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+# combine plots
+plot_grid(c13_cand_fst + labs(x = NULL),
+          c13_cand_deltapi + labs(x = NULL),
+          c13_cand_deltatd + labs(x = NULL),
+          c13_cand_tdOFU6 + labs(x = NULL),
+          c13_cand_dxy,
+          ncol = 1,
+          align = "v",
+          axis = "lr"
+)
+```
+![alt text](image-130.png)
+
+
+```r
+# plot fst vs. dxy
+ggplot(cand_windows_c15, aes(x = avg_dxy, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
+  geom_text_repel(data = cand_windows_c15 %>% filter(candidate | window_pos_1 %in% c(21240001, 21250001)), aes(label = window_pos_1), color = "red", alpha = 1, size = 3) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Average Dxy",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  ```
+![alt text](image-131.png)
 
 <br>
 
@@ -5440,7 +5562,7 @@ General summary across all popgen results:
 
 ### Investigating candidate regions
 
-OFU3 candidate region NC_089312.1:34680001-34720000 :
+#### OFU3 candidate region NC_089312.1:34680001-34720000 :
   - There are two annotated genes within this region, both on the minus strand:
     - NC_089312.1:34679212-34697834	-	chitin synthase chs-2
     - NC_089312.1:34699535-34715212 - uncharacterized LOC131784753
@@ -5474,6 +5596,96 @@ chitin synthase chs-2 [Pocillopora verrucosa]	Pocillopora verrucosa	1270	1270	99
 So it is likely part of the chitin synthase-like gene family or a domain-sharing protein.
 
 Chitin synthase in corals is most likely involved in skeletogenesis and biomineralization. Chitin is a structural polysaccharide that is thought to contribute to the skeletal organic matrix at the tissue–skeleton interface. A plausible hypothesis is that variation in chitin synthase-like genes could influence skeletal organic matrix formation and thereby alter how colonies maintain calcification or structural integrity under the repeated exposure to extreme and fluctuating temperatures in OFU3.
+
+<br>
+
+#### OFU3 candidate region NC_089315.1_1740001_1750000 :
+- There are three annotated features within this region, one on the plus strand and two on the minus strand:
+  - NC_089315.1:1737447-1741768	- uncharacterized LOC131772635 (minus strand)
+  - NC_089315.1:1741808-1744117	- mitochondrial import inner membrane translocase subunit TIM14-like (plus strand)
+  - NC_089315.1:1744087-1755851	- putative helicase MOV-10 (minus strand)
+
+Interestingly, TIM14 is also known as DnaJ Heat Shock Protein Family (Hsp40) Member C19 (DNAJC19), a DnaJ heat shock protein that functions in the import of transit peptide-containing proteins into the mitochondrial matrix.
+
+A blast of the TIM14-like protein sequence returns the following top hits:
+```
+Cluster Composition	Cluster Ancestor	Representative sequence	Scientific Name	Taxid	Max Score	Total Score	Query Cover	E value	Per. ident	Acc. Len	Accession  
+3 member(s) 2 organism(s)	stony corals	mitochondrial import inner membrane translocase subunit TIM14-like isoform X1 [Pocillopora damicornis]	Pocillopora	46730	258	258	100%	1e-86	99.22	128	XP_027056889.1
+1 member(s) 1 organism(s)	stony corals	hypothetical protein ACROYT_G003128 [Oculina patagonica]	Oculina patagonica	130080	212	212	88%	2e-68	90.27	131	KAL9988656.1
+6 member(s) 6 organism(s)	stony corals	DnaJ sub C member 15 [Desmophyllum pertusum]	Scleractinia	6125	211	211	88%	3e-68	92.86	112	KAJ7370130.1
+1 member(s) 1 organism(s)	stony corals	DnaJ subfamily C member 15 [Porites harrisoni]	Porites harrisoni	627007	210	210	88%	1e-67	87.5	129	KAM7451198.1
+2 member(s) 2 organism(s)		mitochondrial import inner membrane translocase subunit TIM14-like [Porites lutea]		3687091	207	207	88%	1e-66	86.61	112	XP_073243087.1
+1 member(s) 1 organism(s)	starlet sea anemone	mitochondrial import inner membrane translocase subunit TIM14 [Nematostella vectensis]	Nematostella vectensis	45351	198	198	88%	4e-63	83.04	112	XP_001622900.2
+```
+
+<br>
+
+A blast of the uncharacterized LOC131772635 protein sequence returns a lot of clathrin-like hits, but with only partial coverage of the query sequence:
+```
+Cluster Composition	Cluster Ancestor	Representative sequence	Max Score	Total Score	Query Cover	E value	Per. ident	Acc. Len	Accession  
+1 member(s) 1 organism(s)	stony corals	uncharacterized protein [Pocillopora verrucosa]	230	230	100%	5e-76	100	113	XP_058944572.2
+3 member(s) 2 organism(s)	stony corals	clathrin light chain B-like isoform X1 [Pocillopora damicornis]	134	134	58%	7e-37	96.97	196	XP_027056875.1
+1 member(s) 1 organism(s)	cauliflower coral	hypothetical protein pdam_00013739 [Pocillopora damicornis]	134	134	58%	1e-35	96.97	294	RMX60611.1
+1 member(s) 1 organism(s)	stony corals	hypothetical protein OS493_034060 [Desmophyllum pertusum]	103	103	58%	6e-25	75.76	196	KAJ7370131.1
+1 member(s) 1 organism(s)	stony corals	hypothetical protein AWC38_SpisGene18006 [Stylophora pistillata]	95.5	95.5	60%	4e-23	85.29	77	PFX17670.1
+2 member(s) 2 organism(s)	stony corals	clathrin light chain A-like [Orbicella faveolata]	97.8	97.8	58%	9e-23	75.76	193	XP_020627321.1
+3 member(s) 3 organism(s)	staghorn corals	clathrin light chain A-like [Acropora millepora]	80.5	80.5	50%	4e-16	68.42	183	XP_029182115.2
+2 member(s) 2 organism(s)	stony corals	hypothetical protein ABFA07_001255 [Porites harrisoni]	74.3	74.3	51%	1e-13	64.41	188	KAM7451199.1
+1 member(s) 1 organism(s)	staghorn coral	Clathrin light chain A [Acropora cervicornis]	75.5	75.5	50%	1e-13	56.16	255	KAK2566017.1
+1 member(s) 1 organism(s)	stony corals	clathrin light chain A-like [Porites lutea]	74.7	74.7	51%	2e-13	64.41	227	XP_073243086.1
+1 member(s) 1 organism(s)	stony corals	clathrin light chain A-like [Montipora foliosa]	71.6	71.6	50%	1e-12	61.4	183	XP_068695770.1
+1 member(s) 1 organism(s)	stony corals	clathrin light chain A-like [Montipora capricornis]	72	72	50%	1e-12	61.4	206	XP_068732908.1
+1 member(s) 1 organism(s)	sea anemones	hypothetical protein QZH41_019617 [Actinostola sp. cb2023]	60.1	60.1	62%	7e-09	57.33	113	KAK3728243.1
+2 member(s) 1 organism(s)	starlet sea anemone	predicted protein [Nematostella vectensis]	61.6	61.6	63%	8e-09	53.33	198	EDO30793.1
+1 member(s) 1 organism(s)	sea anemones	clathrin light chain [Exaiptasia diaphana]	58.2	58.2	58%	2e-07	54.93	198	XP_020910716.1
+3 member(s) 2 organism(s)	stony corals	putative helicase MOV-10 [Stylophora pistillata]	54.3	54.3	25%	1e-05	82.14	927	PFX25677.1
+1 member(s) 1 organism(s)	Australian red waratah sea anemone	clathrin light chain A-like [Actinia tenebrosa]	49.7	49.7	57%	3e-04	50	201	XP_031555047.1
+1 member(s) 1 organism(s)	soft corals	Clathrin light chain A [Paramuricea clavata]	48.5	48.5	53%	7e-04	49.28	200	CAB4015958.1
+1 member(s) 1 organism(s)	placozoans	Clathrin light chain A, partial [Trichoplax sp. H2]	47.4	47.4	57%	0.002	40.26	210	RDD44370.1
+1 member(s) 1 organism(s)	soft corals	clathrin light chain A-like [Dendronephthya gigantea]	45.8	45.8	57%	0.007	47.06	202	XP_028394753.1
+2 member(s) 1 organism(s)	stony corals	putative helicase MOV-10 [Stylophora pistillata]	44.3	44.3	32%	0.036	61.11	954	PFX17671.1
+```
+Clathrin light chain A is a regulatory component of the clathrin coat that helps organize coated pits and vesicles during receptor-mediated endocytosis.
+
+<br>
+
+A blast of the putative helicase MOV-10 protein sequence returns many putative MOV10 homologs, though none look like perfect 1:1 orthologs (highest identity is 74% with full coverage of the gene)
+```
+Cluster Composition	Cluster Ancestor	Representative sequence	Max Score	Total Score	Query Cover	E value	Per. ident	Acc. Len	Accession  	
+2 member(s) 1 organism(s)	stony corals	hypothetical protein ACROYT_G003129 [Oculina patagonica]	1499	1499	100%	0	73.53	1011	KAL9988657.1	
+2 member(s) 1 organism(s)	stony corals	putative helicase mov-10-B.1 isoform X2 [Orbicella franksi]	1469	1469	100%	0	71.3	983	XP_081325785.1	
+2 member(s) 1 organism(s)	stony corals	putative helicase MOV-10 [Stylophora pistillata]	1387	1387	99%	0	71.84	954	PFX17671.1	
+1 member(s) 1 organism(s)	stony corals	putative helicase MOV-10 [Oculina patagonica]	1377	1377	100%	0	68.52	1014	XP_078384837.1	
+1 member(s) 1 organism(s)	stony corals	putative helicase MOV-10 [Orbicella franksi]	1361	1361	100%	0	66.73	1016	XP_081325756.1	
+1 member(s) 1 organism(s)	stony corals	putative helicase MOV-10 isoform X1 [Porites lutea]	1344	1344	100%	0	66.57	1026	XP_073243083.1	
+2 member(s) 2 organism(s)	stony corals	putative helicase MOV-10 [Pocillopora verrucosa]	1342	1342	100%	0	66.01	1018	XP_066021257.1	
+3 member(s) 1 organism(s)	stony corals	putative helicase MOV-10 isoform X2 [Orbicella franksi]	1332	1332	100%	0	65.21	1607	XP_081326356.1	
+1 member(s) 1 organism(s)	stony corals	putative helicase MOV-10 [Pocillopora verrucosa]	1326	1326	99%	0	65.6	1691	XP_066021254.1	
+3 member(s) 3 organism(s)	stony corals	putative helicase MOV-10 [Pocillopora verrucosa]	1324	1324	99%	0	65.64	1011	XP_058944576.2	
+5 member(s) 2 organism(s)	stony corals	putative helicase mov-10-B.1 [Montipora foliosa]	1299	1299	100%	0	64.19	999	XP_068695788.1	
+3 member(s) 2 organism(s)	stony corals	putative helicase MOV-10 [Stylophora pistillata]	1257	1682	93%	0	88.75	927	PFX25677.1	
+1 member(s) 1 organism(s)	stony corals	putative helicase MOV-10 [Stylophora pistillata]	1247	1365	100%	0	67.25	1221	PFX25675.1	
+1 member(s) 1 organism(s)	stony corals	putative helicase mov-10-B.1, partial [Orbicella faveolata]	1207	1357	83%	0	70.97	963	XP_020627368.1	
+1 member(s) 1 organism(s)	stony corals	putative helicase mov-10-B.1 isoform X2 [Montipora capricornis]	1076	1076	76%	0	69.04	766	XP_068732850.1	
+2 member(s) 2 organism(s)	stony corals	putative helicase mov-10-B.1 isoform X2 [Porites lutea]	1037	1037	69%	0	73.37	709	XP_073243084.1	
+1 member(s) 1 organism(s)	stony corals	Helicase MOV-10 [Desmophyllum pertusum]	943	943	66%	0	70.27	660	KAJ7370129.1	
+```
+MOV10 is an RNA helicase involved in post-transcriptional RNA regulation, RNA-protein complex remodeling, mRNA turnover/silencing, and defense against mobile or viral genetic elements.
+
+<br>
+<br>
+
+#### OFU6 candidate region NC_089315.1_21190001-21260000 :
+- There are 6 annotated genes within this region, both on the minus strand:
+    - NC_089315.1:21185958-21197996 - leucine-rich repeat-containing protein 49
+    - NC_089315.1:21207514-21213867 - tetraspanin-36-like
+    - NC_089315.1:21229902-21244360 - synergin gamma
+    - NC_089315.1:21244865-21246511 - centromere protein W
+    - NC_089315.1:21246093-21250678 - uncharacterized LOC131773099
+    - NC_089315.1:21250817-21263136 - mitochondrial-processing peptidase subunit alpha-like
+
+A blast of the transcript sequence returns other uncharacterized proteins from other Pocillopora species:
+
 
 <br>
 <br>
