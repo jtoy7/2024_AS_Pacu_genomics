@@ -5702,6 +5702,23 @@ These genes are genearlly realted to **membrane organization**, **vesicle traffi
 <br>
 <br>
 
+#### OFU6 candidate region NC_089313.1_3680001-3690000 :
+This is an isolated outlier window, but it is the top FST outlier in the whole dataset for the OFU3/OFU6 comparison.
+- There is 1 annotated feature within this region:
+```
+NC_089313.1:3673614-3698834 (minus) - probable ATP-dependent RNA helicase DDX60 (LOC131773254)
+```
+DDX60 is involved in antiviral immunity and RNA helicase-dependent signaling (GeneCards). Binds ssRNA, dsRNA and dsDNA and can promote the binding of RIGI to dsRNA. Selectively reduces infectious titers of viruses that depend on type II IRES-mediated translation by modulating ribosome occupancy on type II IRES-containing viral mRNAs, without affecting type I IRES-mediated translation (UniProt).
+
+
+
+
+
+
+
+
+<br>
+<br>
 
 #### Now let's zoom in on the FTEL vs. ALOF comparison specifically 
 ```r
