@@ -5755,6 +5755,7 @@ FTEL_ALOF_fst_summary <- FTEL_ALOF_comp %>%
     median = median(avg_hudson_fst, na.rm = TRUE),
     q95 = quantile(avg_hudson_fst, 0.95, na.rm = TRUE),
     q99 = quantile(avg_hudson_fst, 0.99, na.rm = TRUE),
+    q999 = quantile(avg_hudson_fst, 0.999, na.rm = TRUE),
     max = max(avg_hudson_fst, na.rm = TRUE),
     n_windows = n()
   )
@@ -5762,18 +5763,15 @@ FTEL_ALOF_fst_summary <- FTEL_ALOF_comp %>%
 FTEL_ALOF_fst_summary
 ```
 ```
-  w_mean  median   q95   q99   max n_windows
-  0.0144 0.00395 0.103 0.169 0.566     16566
-  w_mean median    q95   q99   max n_windows
-  0.0222 0.0148 0.0890 0.148 0.293     16566
+w_mean median    q95   q99  q999   max n_windows
+0.0222 0.0148 0.0890 0.148 0.228 0.293     16566
 ```
 
-CONTINUE HERE (2026-06-18_1655)
 <br>
 
 ```r
 # identify outliers based on 99th percentile or 99.9th percentile
-ofu_fst_outliers_q99 <- ofu_comp %>%
+FTELALOF_fst_outliers_q99 <- FTEL_ALOF_comp %>%
   mutate(
     fst_q99 = quantile(avg_hudson_fst, 0.99, na.rm = TRUE),
     window_id = paste(chromosome, window_pos_1, window_pos_2, sep = "_") # make unique window identifier
@@ -5781,54 +5779,172 @@ ofu_fst_outliers_q99 <- ofu_comp %>%
   filter(avg_hudson_fst >= fst_q99) %>%
   arrange(desc(avg_hudson_fst))
 
-ofu_fst_outliers_q999 <- ofu_comp %>%
+FTELALOF_fst_outliers_q999 <- FTEL_ALOF_comp %>%
   mutate(
     fst_q999 = quantile(avg_hudson_fst, 0.999, na.rm = TRUE),
-    window_id = paste(chromosome, window_pos_1, window_pos_2, sep = "_") # madke unique window identifier
+    window_id = paste(chromosome, window_pos_1, window_pos_2, sep = "_") # make unique window identifier
   ) %>%
   filter(avg_hudson_fst >= fst_q999) %>%
   arrange(desc(avg_hudson_fst))
 ```
+Again, the q99 and q999 "outliers" consist of 166 and 17 windows, respectively.
 
 ```r
-str(ofu_fst_outliers_q99)
+FTELALOF_fst_outliers_q999 %>% select(-1)
 ```
 ```
-tibble [166 × 11] (S3: tbl_df/tbl/data.frame)
- $ source_file   : chr [1:166] "./location//NC_089313.1_Pverrucosa.location_fst.txt" "./location//NC_089312.1_Pverrucosa.location_fst.txt" "./location//NC_089312.1_Pverrucosa.location_fst.txt" "./location//NC_089312.1_Pverrucosa.location_fst.txt" ...
- $ pop1          : Factor w/ 9 levels "ALOF","AOAA",..: 8 8 8 8 8 8 8 8 8 8 ...
- $ pop2          : Factor w/ 9 levels "AOAA","FALU",..: 8 8 8 8 8 8 8 8 8 8 ...
- $ chromosome    : Factor w/ 27 levels "NC_089312.1",..: 2 1 1 1 4 4 4 1 4 4 ...
- $ window_pos_1  : num [1:166] 3680001 34690001 34680001 34700001 21220001 ...
- $ window_pos_2  : num [1:166] 3690000 34700000 34690000 34710000 21230000 ...
- $ avg_hudson_fst: num [1:166] 0.566 0.521 0.506 0.486 0.404 ...
- $ no_snps       : num [1:166] 32 67 70 47 30 59 118 93 65 117 ...
- $ comparison    : Factor w/ 45 levels "ALOF_AOAA","ALOF_FALU",..: 43 43 43 43 43 43 43 43 43 43 ...
- $ fst_q99       : Named num [1:166] 0.169 0.169 0.169 0.169 0.169 ...
-  ..- attr(*, "names")= chr [1:166] "99%" "99%" "99%" "99%" ...
- $ window_id     : chr [1:166] "NC_089313.1_3680001_3690000" "NC_089312.1_34690001_34700000" "NC_089312.1_34680001_34690000" "NC_089312.1_34700001_34710000" ...
+   pop1  pop2  chromosome  window_pos_1 window_pos_2 avg_hudson_fst no_snps comparison fst_q999 window_id                    
+   <fct> <fct> <fct>              <dbl>        <dbl>          <dbl>   <dbl> <fct>         <dbl> <chr>                        
+ 1 ALOF  FTEL  NC_089319.1      7940001      7950000          0.293      62 ALOF_FTEL     0.228 NC_089319.1_7940001_7950000  
+ 2 ALOF  FTEL  NC_089321.1     18670001     18680000          0.280      15 ALOF_FTEL     0.228 NC_089321.1_18670001_18680000
+ 3 ALOF  FTEL  NC_089319.1      7950001      7960000          0.270      52 ALOF_FTEL     0.228 NC_089319.1_7950001_7960000  
+ 4 ALOF  FTEL  NC_089313.1     18150001     18160000          0.270     168 ALOF_FTEL     0.228 NC_089313.1_18150001_18160000
+ 5 ALOF  FTEL  NC_089315.1     29190001     29200000          0.268     159 ALOF_FTEL     0.228 NC_089315.1_29190001_29200000
+ 6 ALOF  FTEL  NC_089320.1     20880001     20890000          0.264      70 ALOF_FTEL     0.228 NC_089320.1_20880001_20890000
+ 7 ALOF  FTEL  NC_089315.1     30530001     30540000          0.261     199 ALOF_FTEL     0.228 NC_089315.1_30530001_30540000
+ 8 ALOF  FTEL  NC_089315.1     28770001     28780000          0.256     112 ALOF_FTEL     0.228 NC_089315.1_28770001_28780000
+ 9 ALOF  FTEL  NC_089315.1     15310001     15320000          0.248     136 ALOF_FTEL     0.228 NC_089315.1_15310001_15320000
+10 ALOF  FTEL  NC_089315.1     29230001     29240000          0.247     125 ALOF_FTEL     0.228 NC_089315.1_29230001_29240000
+11 ALOF  FTEL  NC_089312.1      7910001      7920000          0.234      19 ALOF_FTEL     0.228 NC_089312.1_7910001_7920000  
+12 ALOF  FTEL  NC_089322.1     19180001     19190000          0.234      28 ALOF_FTEL     0.228 NC_089322.1_19180001_19190000
+13 ALOF  FTEL  NC_089312.1     15300001     15310000          0.232      31 ALOF_FTEL     0.228 NC_089312.1_15300001_15310000
+14 ALOF  FTEL  NC_089321.1     18660001     18670000          0.231      50 ALOF_FTEL     0.228 NC_089321.1_18660001_18670000
+15 ALOF  FTEL  NC_089322.1     19110001     19120000          0.231      18 ALOF_FTEL     0.228 NC_089322.1_19110001_19120000
+16 ALOF  FTEL  NC_089312.1     10170001     10180000          0.229      69 ALOF_FTEL     0.228 NC_089312.1_10170001_10180000
+17 ALOF  FTEL  NC_089320.1     10210001     10220000          0.229     107 ALOF_FTEL     0.228 NC_089320.1_10210001_10220000
+```
+
+<br>
+
+List chromosomes with q999 outliers:
+```r
+levels(FTELALOF_fst_outliers_q999$chromosome %>% droplevels())
+```
+
+```
+[1] "NC_089312.1" "NC_089313.1" "NC_089315.1" "NC_089319.1" "NC_089320.1" "NC_089321.1" "NC_089322.1"
 ```
 
 <br>
 
 ```r
-str(ofu_fst_outliers_q999)
+# plot these cutoffs on the genome-wide Fst plot
+q99 <- quantile(FTEL_ALOF_comp$avg_hudson_fst, 0.99, na.rm = TRUE)
+q999 <- quantile(FTEL_ALOF_comp$avg_hudson_fst, 0.999, na.rm = TRUE)
 ```
 ```
-tibble [17 × 11] (S3: tbl_df/tbl/data.frame)
- $ source_file   : chr [1:17] "./location//NC_089313.1_Pverrucosa.location_fst.txt" "./location//NC_089312.1_Pverrucosa.location_fst.txt" "./location//NC_089312.1_Pverrucosa.location_fst.txt" "./location//NC_089312.1_Pverrucosa.location_fst.txt" ...
- $ pop1          : Factor w/ 9 levels "ALOF","AOAA",..: 8 8 8 8 8 8 8 8 8 8 ...
- $ pop2          : Factor w/ 9 levels "AOAA","FALU",..: 8 8 8 8 8 8 8 8 8 8 ...
- $ chromosome    : Factor w/ 27 levels "NC_089312.1",..: 2 1 1 1 4 4 4 1 4 4 ...
- $ window_pos_1  : num [1:17] 3680001 34690001 34680001 34700001 21220001 ...
- $ window_pos_2  : num [1:17] 3690000 34700000 34690000 34710000 21230000 ...
- $ avg_hudson_fst: num [1:17] 0.566 0.521 0.506 0.486 0.404 ...
- $ no_snps       : num [1:17] 32 67 70 47 30 59 118 93 65 117 ...
- $ comparison    : Factor w/ 45 levels "ALOF_AOAA","ALOF_FALU",..: 43 43 43 43 43 43 43 43 43 43 ...
- $ fst_q999      : Named num [1:17] 0.271 0.271 0.271 0.271 0.271 ...
-  ..- attr(*, "names")= chr [1:17] "99.9%" "99.9%" "99.9%" "99.9%" ...
- $ window_id     : chr [1:17] "NC_089313.1_3680001_3690000" "NC_089312.1_34690001_34700000" "NC_089312.1_34680001_34690000" "NC_089312.1_34700001_34710000" ...
+> q99
+              99% 
+0.148279654611214 
+> q999
+            99.9% 
+0.228367600595493 
 ```
-The q99 and q999 "outliers" consist of 166 and 17 windows, respectively.
+Fst 99th and 99.9th percentile cutoffs are 0.148 and 0.228, respectively.
 
 <br>
+
+```r
+# plot Fst per window across the genome for the FTEL/ALOF comparison
+ggplot(FTEL_ALOF_comp, aes(x = window_pos_1, y = avg_hudson_fst)) +
+  geom_point(alpha = 0.3, size = 0.5) +
+  geom_smooth(span = 0.1, color = "red", linewidth = 0.5) +
+  geom_hline(yintercept = q99, color = "darkblue", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = q999, color = "lightblue", linetype = "dashed", linewidth = 0.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+![alt text](image-132.png)
+
+<br>
+
+```
+# check if outliers are robust to SNP count
+ggplot(FTEL_ALOF_comp, aes(x = no_snps, y = avg_hudson_fst)) +
+  geom_point(alpha = 0.3, size = 0.6) +
+  geom_smooth(method = "lm", se = TRUE) +
+  geom_hline(yintercept = q99, color = "darkblue", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = q999, color = "lightblue", linetype = "dashed", linewidth = 0.5) +
+  geom_vline(xintercept = 10, color = "darkgreen", linetype = "dashed") +
+  labs(
+    x = "Number of SNPs per window",
+    y = "Hudson Fst"
+  ) +
+  theme_bw()
+  ```
+  ![alt text](image-133.png)
+Again, among all windows, the outliers tend to have fewer SNPs, but among outlier windows, the windows with the highest Fst don't necessarily have fewer SNPs, which is promising, and all q999 outliers have at least 15 SNPs (max 199).
+
+<br>
+
+```
+# Combine metrics for outlier windows into one dataframe to plot metrics against each other
+# first subset out relevant FTEL/ALOF data into individual dataframes
+FTEL_pi <- pi_location_filt %>% 
+  mutate(
+    window_id = paste(chromosome, window_pos_1, window_pos_2, sep = "_")
+  ) %>% 
+  filter(pop == "FTEL")
+
+ALOF_pi <- pi_location_filt %>% 
+  mutate(
+    window_id = paste(chromosome, window_pos_1, window_pos_2, sep = "_")
+  ) %>% 
+  filter(pop == "ALOF")
+
+
+FTELALOF_dxy <- dxy_location_filt %>% 
+  mutate(
+    window_id = paste(chromosome, window_pos_1, window_pos_2, sep = "_")
+  ) %>% 
+  filter(comparison %in% c("FTEL_ALOF", "ALOF_FTEL"))
+
+
+FTEL_tajimad <- tajimad_location_filt %>% 
+  mutate(
+    window_id = paste(chromosome, window_pos_1, window_pos_2, sep = "_")
+  ) %>% 
+  filter(pop == "FTEL")
+
+ALOF_tajimad <- tajimad_location_filt %>% 
+  mutate(
+    window_id = paste(chromosome, window_pos_1, window_pos_2, sep = "_")
+  ) %>% 
+  filter(pop == "ALOF")
+
+
+# then combine with fst outlier dataframe
+q99_outlier_all_metrics_FTELALOF <- FTELALOF_fst_outliers_q99 %>% 
+  select(pop1, pop2, chromosome, window_pos_1, window_pos_2, window_id, comparison, no_snps, avg_hudson_fst) %>% 
+  left_join(FTEL_pi %>% 
+              select(window_id, avg_pi, no_sites) %>% 
+              rename(avg_pi_FTEL = avg_pi, 
+                     no_sites_pi_FTEL = no_sites),
+            by = "window_id") %>% 
+  left_join(ALOF_pi %>% 
+              select(window_id, avg_pi, no_sites) %>% 
+              rename(avg_pi_ALOF = avg_pi, 
+                     no_sites_pi_ALOF = no_sites),
+            by = "window_id") %>% 
+  left_join(FTELALOF_dxy %>% 
+              select(window_id, avg_dxy, no_sites) %>% 
+              rename(no_sites_dxy = no_sites),
+            by = "window_id") %>% 
+  left_join(FTEL_tajimad %>% 
+              select(window_id, tajima_d, no_sites) %>% 
+              rename(tajima_d_FTEL = tajima_d, 
+                     no_sites_tajimad_FTEL = no_sites),
+            by = "window_id") %>% 
+  left_join(ALOF_tajimad %>% 
+              select(window_id, tajima_d, no_sites) %>% 
+              rename(tajima_d_ALOF = tajima_d, 
+                     no_sites_tajimad_ALOF = no_sites),
+            by = "window_id") %>% 
+  mutate(delta_pi = avg_pi_FTEL - avg_pi_ALOF) %>% 
+  mutate(delta_td = tajima_d_FTEL - tajima_d_ALOF)
+```
