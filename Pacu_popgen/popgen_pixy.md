@@ -5948,3 +5948,40 @@ q99_outlier_all_metrics_FTELALOF <- FTELALOF_fst_outliers_q99 %>%
   mutate(delta_pi = avg_pi_FTEL - avg_pi_ALOF) %>% 
   mutate(delta_td = tajima_d_FTEL - tajima_d_ALOF)
 ```
+
+```r
+# repeat for all windows as reference set
+FTELALOF_all_metrics <- FTEL_ALOF_comp %>% 
+  select(pop1, pop2, chromosome, window_pos_1, window_pos_2, window_id, comparison, no_snps, avg_hudson_fst) %>% 
+  left_join(FTEL_pi %>% 
+              select(window_id, avg_pi, no_sites) %>% 
+              rename(avg_pi_FTEL = avg_pi, 
+                     no_sites_pi_FTEL = no_sites),
+            by = "window_id") %>% 
+  left_join(ALOF_pi %>% 
+              select(window_id, avg_pi, no_sites) %>% 
+              rename(avg_pi_ALOF = avg_pi, 
+                     no_sites_pi_ALOF = no_sites),
+            by = "window_id") %>% 
+  left_join(FTELALOF_dxy %>% 
+              select(window_id, avg_dxy, no_sites) %>% 
+              rename(no_sites_dxy = no_sites),
+            by = "window_id") %>% 
+  left_join(FTEL_tajimad %>% 
+              select(window_id, tajima_d, no_sites) %>% 
+              rename(tajima_d_FTEL = tajima_d, 
+                     no_sites_tajimad_FTEL = no_sites),
+            by = "window_id") %>% 
+  left_join(ALOF_tajimad %>% 
+              select(window_id, tajima_d, no_sites) %>% 
+              rename(tajima_d_ALOF = tajima_d, 
+                     no_sites_tajimad_ALOF = no_sites),
+            by = "window_id") %>% 
+  mutate(delta_pi = avg_pi_FTEL - avg_pi_ALOF) %>% 
+  mutate(delta_td = tajima_d_FTEL - tajima_d_ALOF)
+```
+
+```
+# plot metrics for q99 set over full window set
+
+```
