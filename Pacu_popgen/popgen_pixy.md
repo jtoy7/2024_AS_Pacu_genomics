@@ -5984,4 +5984,203 @@ FTELALOF_all_metrics <- FTEL_ALOF_comp %>%
 ```
 # plot metrics for q99 set over full window set
 
+# fst vs no_snps
+p0_q99 <- ggplot() +
+  geom_point(data = FTELALOF_all_metrics, aes(x = no_snps, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q99_outlier_all_metrics_FTELALOF, aes(x = no_snps, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs FTEL pi
+p1_q99 <- ggplot() +
+  geom_point(data = FTELALOF_all_metrics, aes(x = avg_pi_FTEL, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q99_outlier_all_metrics_FTELALOF, aes(x = avg_pi_FTEL, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs ALOF pi
+p2_q99 <- ggplot() +
+  geom_point(data = FTELALOF_all_metrics, aes(x = avg_pi_ALOF, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q99_outlier_all_metrics_FTELALOF, aes(x = avg_pi_ALOF, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs delta_pi
+p3_q99 <- ggplot() +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_point(data = FTELALOF_all_metrics, aes(x = delta_pi, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q99_outlier_all_metrics_FTELALOF, aes(x = delta_pi, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs FTEL tajimad
+p4_q99 <- ggplot() +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_point(data = FTELALOF_all_metrics, aes(x = tajima_d_FTEL, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q99_outlier_all_metrics_FTELALOF, aes(x = tajima_d_FTEL, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs ALOF tajimad
+p5_q99 <- ggplot() +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_point(data = FTELALOF_all_metrics, aes(x = tajima_d_ALOF, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q99_outlier_all_metrics_FTELALOF, aes(x = tajima_d_ALOF, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs delta_tajimad
+p6_q99 <- ggplot() +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_point(data = FTELALOF_all_metrics, aes(x = delta_td, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q99_outlier_all_metrics_FTELALOF, aes(x = delta_td, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs dxy
+p7_q99 <- ggplot() +
+  geom_point(data = FTELALOF_all_metrics, aes(x = avg_dxy, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q99_outlier_all_metrics_FTELALOF, aes(x = avg_dxy, y = avg_hudson_fst), color = "red") +
+  theme_bw()
 ```
+
+```r
+plot_grid(p0_q99, p1_q99, p2_q99, p3_q99, nrow = 2)
+```
+![alt text](image-134.png)
+
+<br>
+
+Interpretation:
+- Fst vs. no_snps - highest Fst windows have lower SNP counts, but overall outliers are pretty evenly spread across SNP count range.
+- Fst vs. pi_FTEL - mixed bag; some outliers have reduced nucleotide diversity, but no general trend towards low pi that you would expect if there was a strong selective sweep driving Fst outliers. Outlier windows have mostly low-moderate pi, and none fall among the highest-pi windows.
+- Fst vs. pi_ALOF - similar to pi for FTEL; mixed bag.
+- Fst vs. delta_pi - outlier windows are both positive and negative, so elevated Fst is not being driven by reductions in diversity in one site or another. If high-FST windows were mainly being driven by location-specific selective sweeps, we would expect most of them to have lower pi in one location over another.
+
+<br>
+
+```r
+plot_grid(p7_q99, p4_q99, p5_q99, p6_q99, nrow = 2)
+```
+![alt text](image-135.png)
+
+<br>
+
+- Fst vs. dxy - highest Fst windows are mostly at low to moderate Dxy, not concentrated at the extreme highest Dxy values. If there were deep absolute divergence between the two sites in these windows (e.g., from prolonged isolation, restricted gene flow), we'd expect to see outlier windows with high Fst and high Dxy. We don't see that here.
+- Fst vs. tajima_d_FTEL - highest Fst windows have pretty even positive/negative distribution. No strong signal of directional selection here.
+- Fst vs. tajima_d_ALOF - full dataset and outliers both skewed notably negative compared to the FTEL distribution, with outliers even more skewed than full dataset, indicative of potential directional selection at ALOF or non-equilibrium dynamics.
+- Fst vs. delta_td - full dataset and outliers both skewed positive (Tajima's D greater in FTEL than ALOF). Again, this could be indicative of interesting dynamics happening in ALOF (e.g., directional selection).
+
+<br>
+
+```r
+# Repeat for q999 set
+q999_outlier_all_metrics_FTELALOF <- FTELALOF_fst_outliers_q999 %>% 
+  select(pop1, pop2, chromosome, window_pos_1, window_pos_2, window_id, comparison, no_snps, avg_hudson_fst) %>% 
+  left_join(FTEL_pi %>% 
+              select(window_id, avg_pi, no_sites) %>% 
+              rename(avg_pi_FTEL = avg_pi, 
+                     no_sites_pi_FTEL = no_sites),
+            by = "window_id") %>% 
+  left_join(ALOF_pi %>% 
+              select(window_id, avg_pi, no_sites) %>% 
+              rename(avg_pi_ALOF = avg_pi, 
+                     no_sites_pi_ALOF = no_sites),
+            by = "window_id") %>% 
+  left_join(FTELALOF_dxy %>% 
+              select(window_id, avg_dxy, no_sites) %>% 
+              rename(no_sites_dxy = no_sites),
+            by = "window_id") %>% 
+  left_join(FTEL_tajimad %>% 
+              select(window_id, tajima_d, no_sites) %>% 
+              rename(tajima_d_FTEL = tajima_d, 
+                     no_sites_tajimad_FTEL = no_sites),
+            by = "window_id") %>% 
+  left_join(ALOF_tajimad %>% 
+              select(window_id, tajima_d, no_sites) %>% 
+              rename(tajima_d_ALOF = tajima_d, 
+                     no_sites_tajimad_ALOF = no_sites),
+            by = "window_id") %>% 
+  mutate(delta_pi = avg_pi_FTEL - avg_pi_ALOF) %>% 
+  mutate(delta_td = tajima_d_FTEL - tajima_d_ALOF)
+
+```
+
+<br>
+
+```r
+# plot metrics for q999 set over full window set
+
+# fst vs no_snps
+p0_q999 <- ggplot() +
+  geom_point(data = FTELALOF_all_metrics, aes(x = no_snps, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = no_snps, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs FTEL pi
+p1_q999 <- ggplot() +
+  geom_point(data = FTELALOF_all_metrics, aes(x = avg_pi_FTEL, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = avg_pi_FTEL, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs ALOF pi
+p2_q999 <- ggplot() +
+  geom_point(data = FTELALOF_all_metrics, aes(x = avg_pi_ALOF, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = avg_pi_ALOF, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs delta_pi
+p3_q999 <- ggplot() +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_point(data = FTELALOF_all_metrics, aes(x = delta_pi, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = delta_pi, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs FTEL tajimad
+p4_q999 <- ggplot() +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_point(data = FTELALOF_all_metrics, aes(x = tajima_d_FTEL, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = tajima_d_FTEL, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs ALOF tajimad
+p5_q999 <- ggplot() +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_point(data = FTELALOF_all_metrics, aes(x = tajima_d_ALOF, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = tajima_d_ALOF, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs delta_tajimad
+p6_q999 <- ggplot() +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_point(data = FTELALOF_all_metrics, aes(x = delta_td, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = delta_td, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+
+# fst vs dxy
+p7_q999 <- ggplot() +
+  geom_point(data = FTELALOF_all_metrics, aes(x = avg_dxy, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = avg_dxy, y = avg_hudson_fst), color = "red") +
+  theme_bw()
+```
+
+```r
+plot_grid(p0_q999, p1_q999, p2_q999, p3_q999, nrow = 2)
+```
+![alt text](image-137.png)
+
+<br>
+
+Interpretation:
+- general patterns are similar to q99 outlier set
+- delta pi a little move negative skewed (FTEL_pi < ALOF_pi)
+- the two outliers with high FST that have the most positive/negative delta_pi are interesting, since high FST and reduced pi in one location over another can indicate directional selection in that population.
+
+<br>
+
+```r
+plot_grid(p7_q999, p4_q999, p5_q999, p6_q999, nrow = 2)
+```
+![alt text](image-136.png)
+
+<br>
+
+Interpretation:
+- Again, general patterns are pretty similar to q99 outlier set
+- delta_td still skewed a bit positive
+
+<br>
+
