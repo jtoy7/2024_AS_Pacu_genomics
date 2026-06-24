@@ -6042,8 +6042,6 @@ plot_grid(p0_q99, p1_q99, p2_q99, p3_q99, nrow = 2)
 ```
 ![alt text](image-134.png)
 
-<br>
-
 Interpretation:
 - Fst vs. no_snps - highest Fst windows have lower SNP counts, but overall outliers are pretty evenly spread across SNP count range.
 - Fst vs. pi_FTEL - mixed bag; some outliers have reduced nucleotide diversity, but no general trend towards low pi that you would expect if there was a strong selective sweep driving Fst outliers. Outlier windows have mostly low-moderate pi, and none fall among the highest-pi windows.
@@ -6057,8 +6055,7 @@ plot_grid(p7_q99, p4_q99, p5_q99, p6_q99, nrow = 2)
 ```
 ![alt text](image-135.png)
 
-<br>
-
+Interpretation:
 - Fst vs. dxy - highest Fst windows are mostly at low to moderate Dxy, not concentrated at the extreme highest Dxy values. If there were deep absolute divergence between the two sites in these windows (e.g., from prolonged isolation, restricted gene flow), we'd expect to see outlier windows with high Fst and high Dxy. We don't see that here.
 - Fst vs. tajima_d_FTEL - highest Fst windows have pretty even positive/negative distribution. No strong signal of directional selection here.
 - Fst vs. tajima_d_ALOF - full dataset and outliers both skewed notably negative compared to the FTEL distribution, with outliers even more skewed than full dataset, indicative of potential directional selection at ALOF or non-equilibrium dynamics.
@@ -6162,8 +6159,6 @@ plot_grid(p0_q999, p1_q999, p2_q999, p3_q999, nrow = 2)
 ```
 ![alt text](image-137.png)
 
-<br>
-
 Interpretation:
 - general patterns are similar to q99 outlier set
 - delta pi a little move negative skewed (FTEL_pi < ALOF_pi)
@@ -6176,11 +6171,183 @@ plot_grid(p7_q999, p4_q999, p5_q999, p6_q999, nrow = 2)
 ```
 ![alt text](image-136.png)
 
-<br>
-
 Interpretation:
 - Again, general patterns are pretty similar to q99 outlier set
 - delta_td still skewed a bit positive
 
 <br>
 
+Synthesis: The q999 outlier set remains heterogeneous overall and does not show elevated Dxy, so it does not support a genome-wide pattern of deep divergence or a uniform selection signature. However, there are some interesting candidate regions that combine high FST with lower ALOF π, more negative ALOF Tajima’s D, and non-elevated Dxy (e.g., NC_089320.1_20880001_20890000).
+
+<br>
+
+```r
+# Let plot the candidate regions on their respective chromosomes
+# create new column that indicates the q999 candidate windows then filter for only those chromosomes with candidate windows
+cand_windows_FTELALOF <- FTELALOF_all_metrics %>% 
+  mutate(
+    candidate_q999 = window_id %in% q999_outlier_all_metrics_FTELALOF$window_id,
+    candidate_q99 = window_id %in% q99_outlier_all_metrics_FTELALOF$window_id
+  ) %>% 
+  filter(chromosome %in% q999_outlier_all_metrics_FTELALOF$chromosome)
+
+# plot fst
+cand_reg_fst_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot delta_pi
+cand_reg_deltapi_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = delta_pi)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Δπ"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot delta_td
+cand_reg_deltatd_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = delta_td)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Δ Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+# combine plots
+plot_grid(cand_reg_fst_FTELALOF + labs(x = NULL),
+          cand_reg_deltapi_FTELALOF + labs(x = NULL),
+          cand_reg_deltatd_FTELALOF,
+          ncol = 1,
+          align = "v",
+          axis = "lr"
+)
+```
+
+<br>
+![alt text](image-139.png)
+Two regions stand out as the most promising candidates:
+- NC_089320.1_20860001-20960000 (six q99 windows, including one q999 window; high FST, high delta pi, high delta TD)
+- NC_089315.1_29180001-29250000 (five q99 windows, including two q999 windows; high FST, low delta pi, lower delta TD)
+
+<br>
+
+```r
+cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" & candidate_q99 == TRUE) %>% select(pop1, pop2, window_id, window_pos_1, avg_hudson_fst, avg_dxy, delta_pi, delta_td, candidate_q99, candidate_q999)
+```
+```
+   pop1  pop2  window_id                     window_pos_1 avg_hudson_fst  avg_dxy   delta_pi delta_td candidate_q99 candidate_q999
+   <fct> <fct> <chr>                                <dbl>          <dbl>    <dbl>      <dbl>    <dbl> <lgl>         <lgl>         
+ 1 ALOF  FTEL  NC_089315.1_13520001_13530000     13520001          0.158 0.00160  -0.000170    0.967  TRUE          FALSE         
+ 2 ALOF  FTEL  NC_089315.1_15310001_15320000     15310001          0.248 0.00287  -0.000636    0.306  TRUE          TRUE          
+ 3 ALOF  FTEL  NC_089315.1_15330001_15340000     15330001          0.149 0.00135  -0.000636   -0.447  TRUE          FALSE         
+ 4 ALOF  FTEL  NC_089315.1_15340001_15350000     15340001          0.152 0.00478  -0.00103    -0.313  TRUE          FALSE         
+ 5 ALOF  FTEL  NC_089315.1_15500001_15510000     15500001          0.205 0.00111  -0.000613   -0.963  TRUE          FALSE         
+ 6 ALOF  FTEL  NC_089315.1_15520001_15530000     15520001          0.190 0.000696 -0.000152    0.0530 TRUE          FALSE         
+ 7 ALOF  FTEL  NC_089315.1_28610001_28620000     28610001          0.164 0.000369 -0.0000332   0.456  TRUE          FALSE         
+ 8 ALOF  FTEL  NC_089315.1_28770001_28780000     28770001          0.256 0.00218  -0.000899   -0.969  TRUE          TRUE          
+ 9 ALOF  FTEL  NC_089315.1_28880001_28890000     28880001          0.158 0.00131  -0.0000394   0.345  TRUE          FALSE         
+10 ALOF  FTEL  NC_089315.1_28940001_28950000     28940001          0.165 0.00189  -0.000728   -0.169  TRUE          FALSE         
+11 ALOF  FTEL  NC_089315.1_29180001_29190000     29180001          0.181 0.00242  -0.000569    0.862  TRUE          FALSE         
+12 ALOF  FTEL  NC_089315.1_29190001_29200000     29190001          0.268 0.00346  -0.00171    -0.623  TRUE          TRUE          
+13 ALOF  FTEL  NC_089315.1_29200001_29210000     29200001          0.224 0.00269  -0.00168    -0.328  TRUE          FALSE         
+14 ALOF  FTEL  NC_089315.1_29230001_29240000     29230001          0.247 0.00247  -0.00101     0.214  TRUE          TRUE          
+15 ALOF  FTEL  NC_089315.1_29240001_29250000     29240001          0.210 0.00380  -0.00136    -0.0424 TRUE          FALSE         
+16 ALOF  FTEL  NC_089315.1_29320001_29330000     29320001          0.156 0.00160   0.000145    1.63   TRUE          FALSE         
+17 ALOF  FTEL  NC_089315.1_30530001_30540000     30530001          0.261 0.00485  -0.000616   -0.164  TRUE          TRUE  
+```
+
+```r
+cand_windows_FTELALOF %>% filter(chromosome == "NC_089320.1" & candidate_q99 == TRUE) %>% select(pop1, pop2, window_id, window_pos_1, avg_hudson_fst, avg_dxy, delta_pi, delta_td, candidate_q99, candidate_q999)
+```
+```
+   pop1  pop2  window_id                     window_pos_1 avg_hudson_fst  avg_dxy   delta_pi delta_td candidate_q99 candidate_q999
+   <fct> <fct> <chr>                                <dbl>          <dbl>    <dbl>      <dbl>    <dbl> <lgl>         <lgl>         
+ 1 ALOF  FTEL  NC_089320.1_3720001_3730000        3720001          0.154 0.00384  -0.00177     -0.564 TRUE          FALSE         
+ 2 ALOF  FTEL  NC_089320.1_4530001_4540000        4530001          0.151 0.00147  -0.000364    -0.369 TRUE          FALSE         
+ 3 ALOF  FTEL  NC_089320.1_10200001_10210000     10200001          0.152 0.00279   0.00110      2.62  TRUE          FALSE         
+ 4 ALOF  FTEL  NC_089320.1_10210001_10220000     10210001          0.229 0.00407   0.000602     0.953 TRUE          TRUE          
+ 5 ALOF  FTEL  NC_089320.1_10220001_10230000     10220001          0.164 0.00171   0.0000811    0.887 TRUE          FALSE         
+ 6 ALOF  FTEL  NC_089320.1_10230001_10240000     10230001          0.198 0.00160   0.000234     1.44  TRUE          FALSE         
+ 7 ALOF  FTEL  NC_089320.1_10240001_10250000     10240001          0.173 0.00361   0.000600     1.11  TRUE          FALSE         
+ 8 ALOF  FTEL  NC_089320.1_10330001_10340000     10330001          0.216 0.00424   0.000409     0.553 TRUE          FALSE         
+ 9 ALOF  FTEL  NC_089320.1_10370001_10380000     10370001          0.198 0.000525  0.0000981    1.21  TRUE          FALSE         
+10 ALOF  FTEL  NC_089320.1_10380001_10390000     10380001          0.202 0.00122   0.000150     1.51  TRUE          FALSE 
+```
+
+<br>
+
+```r
+# plot fst
+cand_reg_fst_FTELALOF_c15c20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000), aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot delta_pi
+cand_reg_deltapi_FTELALOF_c15c20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000), aes(x = window_pos_1/1e6, y = delta_pi)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Δπ"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot delta_td
+cand_reg_deltatd_FTELALOF_c15c20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000), aes(x = window_pos_1/1e6, y = delta_td)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Δ Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+# combine plots
+plot_grid(cand_reg_fst_FTELALOF_c15c20 + labs(x = NULL),
+          cand_reg_deltapi_FTELALOF_c15c20 + labs(x = NULL),
+          cand_reg_deltatd_FTELALOF_c15c20,
+          ncol = 1,
+          align = "v",
+          axis = "lr"
+)
+```
+![alt text](image-140.png)
