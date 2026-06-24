@@ -6243,8 +6243,6 @@ plot_grid(cand_reg_fst_FTELALOF + labs(x = NULL),
           axis = "lr"
 )
 ```
-
-<br>
 ![alt text](image-139.png)
 
 Two regions stand out as the most promising candidates:
