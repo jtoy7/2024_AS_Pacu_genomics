@@ -6388,3 +6388,21 @@ ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 ![alt text](image-141.png)
+
+
+
+#### ALOF candidate region NC_089320.1:20860001-20960000
+- There are 10 annotated features within this region, five on the plus strand and five on the minus strand:
+
+| Accession   | Begin    | End      | Chromosome | Orientation | Name                                              | Symbol       | Gene_ID   | Gene Type      | Transcripts_accession | Protein_accession | Protein_length_aa |
+|-------------|----------|----------|------------|-------------|---------------------------------------------------|--------------|-----------|----------------|-----------------------|-------------------|-------------------|
+| NC_089320.1 | 20870730 | 20873176 | 9          | plus        | serine/threonine-protein kinase mos-like          | LOC131777073 | 131777073 | protein-coding | XM_059093290.2        | XP_058949273.2    | 343               |
+| NC_089320.1 | 20874346 | 20893639 | 9          | plus        | mitogen-activated protein kinase kinase kinase 4  | LOC131777037 | 131777037 | protein-coding | XM_059093249.2        | XP_058949232.2    | 1536              |
+| NC_089320.1 | 20883872 | 20889538 | 9          | minus       | uncharacterized LOC136283270                      | LOC136283270 | 136283270 | lncRNA         | XR_010718682.1        |                   |                   |
+| NC_089320.1 | 20893907 | 20902688 | 9          | minus       | chromatin assembly factor 1 subunit B             | LOC131777064 | 131777064 | protein-coding | XM_059093275.2        | XP_058949258.2    | 793               |
+| NC_089320.1 | 20902812 | 20923400 | 9          | plus        | tudor domain-containing protein 1-like            | LOC131777103 | 131777103 | protein-coding | XM_066172292.1        | XP_066028389.1    | 1599              |
+| NC_089320.1 | 20932612 | 20937867 | 9          | plus        | ribosome production factor 2 homolog              | LOC131777102 | 131777102 | protein-coding | XM_059093325.2        | XP_058949308.2    | 306               |
+| NC_089320.1 | 20938263 | 20942352 | 9          | minus       | spindle and kinetochore-associated protein 3-like | LOC131777101 | 131777101 | protein-coding | XM_059093324.2        | XP_058949307.2    | 440               |
+| NC_089320.1 | 20942448 | 20949740 | 9          | plus        | peptidyl-prolyl cis-trans isomerase-like 4        | LOC131777069 | 131777069 | protein-coding | XM_059093282.2        | XP_058949265.2    | 537               |
+| NC_089320.1 | 20950271 | 20959353 | 9          | minus       | kinetochore protein NDC80 homolog                 | LOC131777068 | 131777068 | protein-coding | XM_059093281.2        | XP_058949264.2    | 639               |
+| NC_089320.1 | 20959597 | 20968785 | 9          | minus       | uncharacterized LOC131777057                      | LOC131777057 | 131777057 | protein-coding | XM_066172582.1        | XP_066028679.1    | 456               |
