@@ -6351,3 +6351,21 @@ plot_grid(cand_reg_fst_FTELALOF_c15c20 + labs(x = NULL),
 )
 ```
 ![alt text](image-140.png)
+
+
+```r
+# plot fst vs dxy
+ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000), aes(x = avg_dxy, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_text_repel(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 20000000) %>% filter(candidate_q99), aes(label = window_pos_1), color = "red", alpha = 1, size = 3) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Average dxy",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+![alt text](image-141.png)
