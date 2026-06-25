@@ -5720,7 +5720,7 @@ DDX60 is involved in antiviral immunity and RNA helicase-dependent signaling (Ge
 <br>
 <br>
 
-#### Now let's zoom in on the FTEL vs. ALOF comparison specifically 
+#### Now let's zoom in on the FTEL vs. ALOF comparison specifically (lowest and highest ED50 locations, respectively)
 ```r
 FTEL_ALOF_comp <- fst_location_filt_snpfilt %>% 
   filter(comparison %in% c("FTEL_ALOF", "ALOF_FTEL"))
