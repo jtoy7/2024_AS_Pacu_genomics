@@ -6233,21 +6233,37 @@ cand_reg_deltatd_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+# plot dxy
+cand_reg_dxy_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = avg_dxy)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Dxy"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 # combine plots
 plot_grid(cand_reg_fst_FTELALOF + labs(x = NULL),
           cand_reg_deltapi_FTELALOF + labs(x = NULL),
-          cand_reg_deltatd_FTELALOF,
+          cand_reg_deltatd_FTELALOF + labs(x = NULL),
+          cand_reg_dxy_FTELALOF,
           ncol = 1,
           align = "v",
           axis = "lr"
 )
 ```
-![alt text](image-139.png)
+![alt text](image-142.png)
 
-Two regions stand out as the most promising candidates:
+Two regions stand out as the most promising sweep candidates:
 - NC_089320.1_20860001-20960000 (six q99 windows, including one q999 window; high FST, high delta pi, high delta TD)
 - NC_089315.1_29180001-29250000 (five q99 windows, including two q999 windows; high FST, low delta pi, lower delta TD)
+- Two of the highest FST outliers are also adjacent windows on chromosome NC_089319.1 (7940001-7960000), but they do not exhibit as clean of a sweep pattern in delta pi and delta TD. Delta pi is negative, but delta TD is positive. This suggests that this peak may reflect differentiation of an older or standing haplotype, linked selection in a low-recombination region, or other local allele-frequency-spectrum effects rather than a classic sweep.
 
 <br>
 
@@ -6409,3 +6425,20 @@ ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome
 | NC_089320.1 | 20959597 | 20968785 | 9          | minus       | uncharacterized LOC131777057                      | LOC131777057 | 131777057 | protein-coding | XM_066172582.1        | XP_066028679.1    | 456               |
 
 Interestingly, the only annotations in the q999 window (NC_089320.1_20880001_20890000) were the mitogen-activated protein kinase kinase kinase 4 (MAP3K4) and the uncharacterized lncRNA (long non-coding RNA). MAP3K4 relays signals by activating downstream p38 and JNK mitogen-activated protein kinase (MAPK) pathways and is an enzyme central to how cells respond to environmental stress.
+
+<br>
+
+#### ALOF candidate region NC_089315.1_29180001-29250000
+- There are 9 annotated features within this region, five on the plus strand and four aon the minus strand:
+
+| Accession   | Begin    | End      | Chromosome | Orientation | Name                                             | Symbol       | Gene ID   | Gene Type      | Transcripts accession | Protein accession | Protein length |
+|-------------|----------|----------|------------|-------------|--------------------------------------------------|--------------|-----------|----------------|-----------------------|-------------------|----------------|
+| NC_089315.1 | 29179106 | 29198884 | 4          | minus       | AT-rich interactive domain-containing protein 3C | LOC131779122 | 131779122 | protein-coding | XM_059095655.2        | XP_058951638.1    | 520            |
+| NC_089315.1 | 29202360 | 29210826 | 4          | plus        | uncharacterized LOC131779130                     | LOC131779130 | 131779130 | protein-coding | XM_059095667.2        | XP_058951650.1    | 678            |
+| NC_089315.1 | 29211426 | 29214922 | 4          | plus        | indian hedgehog protein                          | LOC131779118 | 131779118 | protein-coding | XM_059095652.2        | XP_058951635.2    | 415            |
+| NC_089315.1 | 29214112 | 29219428 | 4          | minus       | synaptotagmin-7-like                             | LOC131779117 | 131779117 | protein-coding | XM_059095650.2        | XP_058951633.2    | 460            |
+| NC_089315.1 | 29221375 | 29223146 | 4          | minus       | synaptotagmin-4                                  | LOC131779120 | 131779120 | protein-coding | XM_059095654.2        | XP_058951637.1    | 305            |
+| NC_089315.1 | 29224486 | 29228770 | 4          | minus       | uncharacterized LOC131779136                     | LOC131779136 | 131779136 | protein-coding | XM_066165863.1        | XP_066021960.1    | 909            |
+| NC_089315.1 | 29229473 | 29236355 | 4          | plus        | synaptotagmin-4                                  | LOC131779115 | 131779115 | protein-coding | XM_059095648.2        | XP_058951631.2    | 540            |
+| NC_089315.1 | 29241264 | 29242807 | 4          | plus        | uncharacterized LOC131779131                     | LOC131779131 | 131779131 | misc_RNA       | XR_010717221.1        |                   |                |
+| NC_089315.1 | 29246969 | 29249550 | 4          | plus        | forkhead box protein A2-like                     | LOC136276710 | 136276710 | protein-coding | XM_066165498.1        | XP_066021595.1    | 321            |
