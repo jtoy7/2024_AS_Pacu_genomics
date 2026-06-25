@@ -6389,7 +6389,8 @@ ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome
 ```
 ![alt text](image-141.png)
 
-
+<br>
+<br>
 
 #### ALOF candidate region NC_089320.1:20860001-20960000
 - There are 10 annotated features within this region, five on the plus strand and five on the minus strand:
@@ -6406,3 +6407,5 @@ ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" | chromosome
 | NC_089320.1 | 20942448 | 20949740 | 9          | plus        | peptidyl-prolyl cis-trans isomerase-like 4        | LOC131777069 | 131777069 | protein-coding | XM_059093282.2        | XP_058949265.2    | 537               |
 | NC_089320.1 | 20950271 | 20959353 | 9          | minus       | kinetochore protein NDC80 homolog                 | LOC131777068 | 131777068 | protein-coding | XM_059093281.2        | XP_058949264.2    | 639               |
 | NC_089320.1 | 20959597 | 20968785 | 9          | minus       | uncharacterized LOC131777057                      | LOC131777057 | 131777057 | protein-coding | XM_066172582.1        | XP_066028679.1    | 456               |
+
+Interestingly, the only annotations in the q999 window (NC_089320.1_20880001_20890000) were the mitogen-activated protein kinase kinase kinase 4 (MAP3K4) and the uncharacterized lncRNA (long non-coding RNA). MAP3K4 relays signals by activating downstream p38 and JNK mitogen-activated protein kinase (MAPK) pathways and is an enzyme central to how cells respond to environmental stress.
