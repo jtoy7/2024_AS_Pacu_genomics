@@ -6428,8 +6428,8 @@ Interestingly, the only annotations in the q999 window (NC_089320.1_20880001_208
 
 <br>
 
-#### ALOF candidate region NC_089315.1_29180001-29250000
-- There are 9 annotated features within this region, five on the plus strand and four aon the minus strand:
+#### FTEL candidate region NC_089315.1_29180001-29250000
+- There are 9 annotated features within this region, five on the plus strand and four on the minus strand:
 
 | Accession   | Begin    | End      | Chromosome | Orientation | Name                                             | Symbol       | Gene ID   | Gene Type      | Transcripts accession | Protein accession | Protein length |
 |-------------|----------|----------|------------|-------------|--------------------------------------------------|--------------|-----------|----------------|-----------------------|-------------------|----------------|
@@ -6442,3 +6442,18 @@ Interestingly, the only annotations in the q999 window (NC_089320.1_20880001_208
 | NC_089315.1 | 29229473 | 29236355 | 4          | plus        | synaptotagmin-4                                  | LOC131779115 | 131779115 | protein-coding | XM_059095648.2        | XP_058951631.2    | 540            |
 | NC_089315.1 | 29241264 | 29242807 | 4          | plus        | uncharacterized LOC131779131                     | LOC131779131 | 131779131 | misc_RNA       | XR_010717221.1        |                   |                |
 | NC_089315.1 | 29246969 | 29249550 | 4          | plus        | forkhead box protein A2-like                     | LOC136276710 | 136276710 | protein-coding | XM_066165498.1        | XP_066021595.1    | 321            |
+
+The presence of multiple synaptotagmin genes is interesting. Synaptotagmin-4 (SYT4) is a calcium ion sensor and syntaxin-binding synaptic vesicle protein that helps regulate secretion in neurons. Synaptotagmin-7 (SYT7) is a high-affinity calcium sensor that mediates Ca²⁺-triggered membrane trafficking events. But synaptogens are broadly involved in calcium-regulated membrane trafficking and vesicle fusion, not just neural signaling. It's plausible that this signal could relate to how coral cells regulate symbiont-containing compartments (symbiosome) and exchange of molecules across membranes, but could also relate to other membrane trafficking functions.
+
+<br>
+
+#### High FST candidate region NC_089319.1_7940001-7960000
+- There are 2 annotated features within this region, one on each strand:
+
+| Accession   | Begin   | End     | Chromosome | Orientation | Name                             | Symbol       | Gene ID  | Gene Type      | Transcripts accession | Protein accession | Protein length |
+|-------------|---------|---------|------------|-------------|----------------------------------|--------------|----------|----------------|-----------------------|-------------------|----------------|
+| NC_089319.1 | 7938951 | 7946627 | 8          | minus       | BRCA1-associated ATM activator 1 | LOC131793187 | 1.32E+08 | protein-coding | XM_059110592.2        | XP_058966575.2    | 940            |
+| NC_089319.1 | 7946900 | 7971815 | 8          | plus        | protein flightless-1 homolog     | LOC131793241 | 1.32E+08 | protein-coding | XM_066170535.1        | XP_066026632.1    | 1245           |
+
+The adjacent q999 windows on NC_089319.1 overlap BRAT1-like and FLII-like, with the second window falling entirely within FLII-like. This supports a real FTEL–ALOF differentiated haplotype involving genes associated with DNA-damage response and actin/cytoskeletal regulation. However, because FTEL has reduced π but positive Tajima’s D, the signal does not resemble a simple recent hard sweep.
+
