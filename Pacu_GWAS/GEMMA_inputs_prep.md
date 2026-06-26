@@ -119,3 +119,79 @@ wc -l ../sample_lists/*.txt
  366 sample_list_allramet.txt
  132 sample_list_cpruned.txt
 ```
+
+<br>
+
+Now append "_1" to the sample names to match the PLINK file names exactly, add a column of zeros to these sample lists to create the FID column required by PLINK:
+```bash
+awk 'BEGIN{OFS="\t"} {print 0, $1"_1"}' sample_list_allramet.txt | sort -k2,2 > sample_list_allramet.keep
+awk 'BEGIN{OFS="\t"} {print 0, $1"_1"}' sample_list_cpruned.txt | sort -k2,2 > sample_list_cpruned.keep
+```
+
+<br>
+
+Now use these keep files to filter the PLINK dataset to create two new datasets
+```bash
+mkdir /archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas/kinship_matrix
+cd /archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas/sample_lists
+
+module load plink/1.9-20240319
+
+# create a subset bed/bim/fam with PLINK for all-ramet dataset
+crun.plink plink --bfile ../starting_files/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes \
+    --keep sample_list_allramet.keep \
+    --make-bed \
+    --out ../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet \
+    --allow-extra-chr
+
+# create a subset bed/bim/fam with PLINK for clone-pruned dataset
+crun.plink plink --bfile ../starting_files/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes \
+    --keep sample_list_cpruned.keep \
+    --make-bed \
+    --out ../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_cpruned \
+    --allow-extra-chr
+```
+```
+191515 MB RAM detected; reserving 95757 MB for main workspace.
+76737 variants loaded from .bim file.
+396 people (0 males, 0 females, 396 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet.nosex
+.
+--keep: 366 people remaining.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 366 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate in remaining samples is 0.999809.
+76737 variants and 366 people pass filters and QC.
+Note: No phenotypes present.
+--make-bed to
+../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet.bed
++
+../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet.bim
++
+../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet.fam
+
+
+
+191515 MB RAM detected; reserving 95757 MB for main workspace.
+76737 variants loaded from .bim file.
+396 people (0 males, 0 females, 396 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_cpruned.nosex
+.
+--keep: 132 people remaining.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 132 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate in remaining samples is 0.999806.
+76737 variants and 132 people pass filters and QC.
+Note: No phenotypes present.
+--make-bed to
+../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_cpruned.bed
++
+../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_cpruned.bim
++
+../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_cpruned.fam
+... done.
+```
