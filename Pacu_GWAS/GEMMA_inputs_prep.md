@@ -93,7 +93,7 @@ cp pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes.fam ../../gemma_gwas
 
 <br>
 
-### Start creating gemma input files
+### Start creating GEMMA input files
 Now let's create our sample lists from the multivariate data files:
 ```bash
 cd /archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas/starting_files
@@ -171,9 +171,9 @@ Note: No phenotypes present.
 ../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet.bim
 +
 ../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet.fam
+```
 
-
-
+```
 191515 MB RAM detected; reserving 95757 MB for main workspace.
 76737 variants loaded from .bim file.
 396 people (0 males, 0 females, 396 ambiguous) loaded from .fam.
@@ -195,3 +195,5 @@ Note: No phenotypes present.
 ../kinship_matrix/pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_cpruned.fam
 ... done.
 ```
+
+#### Run kinship matrix calculation
