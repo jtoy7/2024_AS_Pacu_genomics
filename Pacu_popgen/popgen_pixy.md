@@ -6445,6 +6445,8 @@ Interestingly, the only annotations in the q999 window (NC_089320.1_20880001_208
 
 The presence of multiple synaptotagmin genes is interesting. Synaptotagmin-4 (SYT4) is a calcium ion sensor and syntaxin-binding synaptic vesicle protein that helps regulate secretion in neurons. Synaptotagmin-7 (SYT7) is a high-affinity calcium sensor that mediates Ca²⁺-triggered membrane trafficking events. But synaptogens are broadly involved in calcium-regulated membrane trafficking and vesicle fusion, not just neural signaling. It's plausible that this signal could relate to how coral cells regulate symbiont-containing compartments (symbiosome) and exchange of molecules across membranes, but could also relate to other membrane trafficking functions.
 
+Interestingly, there are also a few developmental/regulatory genes in this region.
+
 <br>
 
 #### High FST candidate region NC_089319.1_7940001-7960000
