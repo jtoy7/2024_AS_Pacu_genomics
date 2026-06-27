@@ -124,6 +124,8 @@ wc -l ../sample_lists/*.txt
 
 Now append "_1" to the sample names to match the PLINK file names exactly, add a column of zeros to these sample lists to create the FID column required by PLINK:
 ```bash
+cd ../sample_lists
+
 awk 'BEGIN{OFS="\t"} {print 0, $1"_1"}' sample_list_allramet.txt | sort -k2,2 > sample_list_allramet.keep
 awk 'BEGIN{OFS="\t"} {print 0, $1"_1"}' sample_list_cpruned.txt | sort -k2,2 > sample_list_cpruned.keep
 ```
@@ -196,4 +198,25 @@ Note: No phenotypes present.
 ... done.
 ```
 
+<br>
+
 #### Run kinship matrix calculation
+
+The kinship matrix can be calculated in GEMMA using two different formulas, specified by the `-gk 1` or `-gk 2` flags.
+- `-gk 1` calculates the "centered" relatedness matrix
+- `-gk 2` calculates the standardized relatedness matrix
+
+Here is what the manual says about choosing between these two methods:
+```
+Which of the two relatedness matrix to choose will largely depend on the underlying genetic architecture of the given trait. Specifically, if SNPs with lower minor allele frequency tend to have larger effects (which is inversely proportional to its genotype variance), then the standardized genotype matrix is preferred. If the SNP effect size does not depend on its minor allele frequency, then the centered genotype matrix is preferred. In our previous experience based on a limited examples, we typically find the centered genotype matrix provides better control for population structure in lower organisms, and the two matrices seem to perform similarly in humans.
+```
+
+Given this information, we'll use the `gk -1` option.
+
+Run separate commands for each sample set:
+```bash
+# load GEMMA module
+module load gemma/0.98.5
+
+cd /archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas/kinship_matrix
+```
