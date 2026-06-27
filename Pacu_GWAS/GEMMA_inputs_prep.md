@@ -93,7 +93,10 @@ cp pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes.fam ../../gemma_gwas
 
 <br>
 
-### Start creating GEMMA input files
+### Create GEMMA input files
+
+#### Sample lists
+
 Now let's create our sample lists from the multivariate data files:
 ```bash
 cd /archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas/starting_files
@@ -131,6 +134,8 @@ awk 'BEGIN{OFS="\t"} {print 0, $1"_1"}' sample_list_cpruned.txt | sort -k2,2 > s
 ```
 
 <br>
+
+#### Kinship matrix
 
 Now use these keep files to filter the PLINK dataset to create two new datasets
 ```bash
@@ -200,6 +205,23 @@ Note: No phenotypes present.
 
 <br>
 
+Even though it doesn't use phenotype info for kinship matrix calculation, GEMMA still uses the phenotype column (6) in the .fam file to determine which samples have phenotype data. If it is left as all `-9` values, it will think there are no acceptable samples and not run the calculation, so we need to add dummy values of `1` to column 6 for all rows:
+```bash
+# change column 6 to all 1s, saving to temp file
+awk '{$6=1; print}' pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet.fam > pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet_temp.fam
+
+# replace old fam file
+mv pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet_temp.fam pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet.fam
+
+
+# change column 6 to all 1s, saving to temp file
+awk '{$6=1; print}' pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_cpruned.fam > pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_cpruned_temp.fam
+
+# replace old fam file
+mv pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_cpruned_temp.fam pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_cpruned.fam
+```
+
+
 #### Run kinship matrix calculation
 
 The kinship matrix can be calculated in GEMMA using two different formulas, specified by the `-gk 1` or `-gk 2` flags.
@@ -219,4 +241,51 @@ Run separate commands for each sample set:
 module load gemma/0.98.5
 
 cd /archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas/kinship_matrix
+
+# All-ramet centered kinship matrix
+crun.gemma gemma \
+  -bfile pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet \
+  -gk 1 \
+  -o pacu_allramet_gk1_kinship
+
+# Clone-pruned centered kinship matrix
+crun.gemma gemma \
+  -bfile pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_cpruned \
+  -gk 1 \
+  -o pacu_cpruned_gk1_kinship
 ```
+
+Sanity-check number of columns and rows:
+```bash
+cd output/
+
+awk -F'\t' '{print NF; exit}' pacu_allramet_gk1_kinship.cXX.txt
+awk -F'\t' '{print NF; exit}' pacu_cpruned_gk1_kinship.cXX.txt
+```
+```
+366
+132
+```
+```bash
+wc -l pacu_allramet_gk1_kinship.cXX.txt
+wc -l pacu_cpruned_gk1_kinship.cXX.txt
+```
+```
+366 pacu_allramet_gk1_kinship.cXX.txt
+132 pacu_cpruned_gk1_kinship.cXX.txt
+```
+
+Check matrix values:
+```bash
+head -n 1 pacu_cpruned_gk1_kinship.cXX.txt
+```
+```
+0.3331046075    0.1467563404    -0.0007884663961        0.00573508739   -0.009913133077 0.01050127062   0.1514684088    0.06014035357   -8.357245469e-05        -0.014067081    -0.003500508583 -0.009276607383 0.0074283106    -0.005072324836 -0.005139677284 0.002722573563-0.008593489156 -0.009024034227 -0.008805736329 0.00237475902   -0.01194846075  -0.008941188182 -0.01635688812  -0.0003801671075        -0.002938598056 -0.01050495034  -0.00109994283  -0.005349028314 -0.00741654491  -0.01209094568  -0.00216093229  -0.003488041747 0.01139302152 -0.004076413842 0.006748477049  0.0004874612054 0.002598724382  0.0008935294198 -0.004789230831 0.04035801429   -0.004877672518 -0.0006662554793        -0.003541483038 -0.00109466281  0.01096429047   -0.0089917366   -0.005117233662 -0.0003827003327        -0.005912744856       -0.00672011565  -0.01020037398  -0.01087350333  -0.01143875218  -0.006653930484 -0.008897244144 -0.006847056823 -0.005179293769 -0.01800952836  -0.01414116651  -0.007469640459 -0.00705662535  -0.007787608072 0.004663355887  -0.01609071802  -0.008015500514       0.01193139783   -0.01544327211  -0.003207651329 -0.01180935646  -0.01304580413  -0.01489821639  -0.01864614718  -0.01343906865  -0.007813679174 -0.0003259342743        0.0009369991041 0.001470236711  -0.01393127883  -0.01051821634  0.001871514497  -0.003976918868       0.0006422498605 0.007323840652  -0.002435003379 0.001740831438  -0.004414869636 -0.006302660455 -0.00476185707  -0.01274924143  -0.005314228729 -0.01064049245  0.003620819988  -0.01592394587  0.009369607079  -0.01994103472  -0.00204706666  -0.004332370291 -0.01743142238        -0.01273455955  -0.01159115415  -0.0117262198   -0.007516934037 -0.0152939517   -0.01800007294  0.005155766301  -0.02077770417  -0.01807996255  -0.005220310993 -0.008795981377 -0.01084583361  -0.01752108683  -0.006839932919 -0.01082742307  -7.827984778e-05      -0.0008150402194        -0.01644121992  0.005455194634  -0.00193357774  -0.004057212881 -0.01084906964  -0.01687463964  -0.0003590878558        -0.01125119925  -0.008216145399 -0.003381647796 -0.007919231556 -0.008676136546 -0.01350314017  0.001519034547  0.006608206188        -0.001631594911 0.000895314042
+```
+
+<br>
+
+#### Extract phenotype (ED50) values
+
+Phenotypes will ultimately be incorporated into the genotype plink files as column 6 of the .fam file, but first let's just create a separate file with sample names and ED50 values.
+
