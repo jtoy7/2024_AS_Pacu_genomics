@@ -566,3 +566,13 @@ head *[t,d].fam
 0 2024_ALOF_Pver_24_1 0 0 0 37.8598758999653
 0 2024_ALOF_Pver_27_1 0 0 0 38.046780127904
 ```
+
+<br>
+
+#### Create covariate file
+
+The last file we need is the file of covariate data for each sample. We can create this from the multivariate dataset files.
+
+```bash
+
+```
