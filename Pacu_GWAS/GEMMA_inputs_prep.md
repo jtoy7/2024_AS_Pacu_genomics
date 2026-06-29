@@ -463,3 +463,106 @@ Note: No phenotypes present.
 ../genotypes/pver_all_QDPSB_MISSMAF05filtered_genotypes_cpruned.bim +
 ../genotypes/pver_all_QDPSB_MISSMAF05filtered_genotypes_cpruned.fam ... done.
 ```
+So the all-ramet and clone-pruned genotype files now have `1,107,868` and `1,055,527` SNPs, respectfully.
+
+<br>
+
+Now we need to combine the .fam file with the phenotype file we created earlier, so that the phenotypes are matched to their correct samples in the 6th column of the .fam file. Let's do this in R.
+
+`add_phenotypes_to_fam_file_for_gemma.R`:
+```r
+# Add phenotype values to .fam files for use as genotype/phenotype files in GEMMA analysis
+# Created: 2026-06-29
+# Last updated: 2026-06-29
+# Jason A. Toy
+
+
+rm(list = ls())
+
+setwd("/archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas/")
+
+library(tidyverse)
+
+
+
+# Load in files
+
+# PLINK .fam files
+fam_allramet <- read_delim("genotypes/pver_all_QDPSB_MISSMAF05filtered_genotypes_allramet.fam", col_names = FALSE, delim = " ")
+fam_cpruned <- read_delim("genotypes/pver_all_QDPSB_MISSMAF05filtered_genotypes_cpruned.fam", col_names = FALSE, delim = " ")
+
+str(fam_allramet)
+
+# phenotype value files
+ed50_allramet <- read_delim("phenotypes/Pacu_complete_ed50s.txt", col_names = FALSE, delim = "\t")
+ed50_cpruned <- read_delim("phenotypes/Pacu_complete_cpruned_ed50s.txt", col_names = FALSE, delim = "\t")
+
+str(ed50_allramet)
+
+# Create new .fam files by replacing column 6 with matched phenotype values
+pheno_allramet <- left_join(fam_allramet %>% select(-X6), ed50_allramet, by = c("X2" = "X1"))
+pheno_cpruned <- left_join(fam_cpruned %>% select(-X6), ed50_cpruned, by = c("X2" = "X1"))
+
+str(pheno_allramet)
+
+# Write new .fam files
+write_delim(pheno_allramet, "genotypes/pver_all_QDPSB_MISSMAF05filtered_genotypes_allramet_withpheno.fam", delim = " ", col_names = FALSE)
+write_delim(pheno_cpruned, "genotypes/pver_all_QDPSB_MISSMAF05filtered_genotypes_cpruned_withpheno.fam", delim = " ", col_names = FALSE)
+```
+
+<br>
+
+Now we need to rename the old and new fam files so that the new fam file names match the .bed and .bim file names:
+```bash
+cd /archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas/genotypes
+
+## all-ramet ##
+
+# rename old fam file
+mv pver_all_QDPSB_MISSMAF05filtered_genotypes_allramet.fam pver_all_QDPSB_MISSMAF05filtered_genotypes_allramet_nopheno.fam
+
+# rename new fam file to match bed and bim
+mv pver_all_QDPSB_MISSMAF05filtered_genotypes_allramet_withpheno.fam pver_all_QDPSB_MISSMAF05filtered_genotypes_allramet.fam
+
+
+
+## clone-pruned ##
+
+# rename old fam file
+mv pver_all_QDPSB_MISSMAF05filtered_genotypes_cpruned.fam pver_all_QDPSB_MISSMAF05filtered_genotypes_cpruned_nopheno.fam
+
+# rename new fam file to match bed and bim
+mv pver_all_QDPSB_MISSMAF05filtered_genotypes_cpruned_withpheno.fam pver_all_QDPSB_MISSMAF05filtered_genotypes_cpruned.fam
+```
+
+<br>
+
+Double-check new .fam files:
+```bash
+head *[t,d].fam
+```
+```
+==> pver_all_QDPSB_MISSMAF05filtered_genotypes_allramet.fam <==
+0 2024_ALOF_Pver_02_1 0 0 0 37.274612836513
+0 2024_ALOF_Pver_03_1 0 0 0 37.7280845350833
+0 2024_ALOF_Pver_04_1 0 0 0 37.6325184444698
+0 2024_ALOF_Pver_05_1 0 0 0 37.871523866322804
+0 2024_ALOF_Pver_06_1 0 0 0 37.7970495591192
+0 2024_ALOF_Pver_07_1 0 0 0 37.6121588898274
+0 2024_ALOF_Pver_08_1 0 0 0 37.6306961285469
+0 2024_ALOF_Pver_09_1 0 0 0 36.9392839584712
+0 2024_ALOF_Pver_10_1 0 0 0 37.5853252077299
+0 2024_ALOF_Pver_11_1 0 0 0 37.4656074378858
+
+==> pver_all_QDPSB_MISSMAF05filtered_genotypes_cpruned.fam <==
+0 2024_ALOF_Pver_03_1 0 0 0 37.7280845350833
+0 2024_ALOF_Pver_06_1 0 0 0 37.7970495591192
+0 2024_ALOF_Pver_07_1 0 0 0 37.6121588898274
+0 2024_ALOF_Pver_08_1 0 0 0 37.6306961285469
+0 2024_ALOF_Pver_09_1 0 0 0 36.9392839584712
+0 2024_ALOF_Pver_10_1 0 0 0 37.5853252077299
+0 2024_ALOF_Pver_19_1 0 0 0 37.5161130960978
+0 2024_ALOF_Pver_23_1 0 0 0 37.9794565750908
+0 2024_ALOF_Pver_24_1 0 0 0 37.8598758999653
+0 2024_ALOF_Pver_27_1 0 0 0 38.046780127904
+```
