@@ -218,7 +218,7 @@ Note: No phenotypes present.
 
 Even though it doesn't use phenotype info for kinship matrix calculation, GEMMA still uses the phenotype column (6) in the .fam file to determine which samples have phenotype data. If it is left as all `-9` values, it will think there are no acceptable samples and not run the calculation, so we need to add dummy values of `1` to column 6 for all rows:
 ```bash
-cd ../kinship
+cd ../kinship_matrix
 
 # change column 6 to all 1s, saving to temp file
 awk '{$6=1; print}' pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet.fam > pver_all_QDPSB_MISSMAF05filtered_ld_pruned_0.2_genotypes_gemmakinship_allramet_temp.fam
@@ -246,7 +246,7 @@ Here is what the manual says about choosing between these two methods:
 Which of the two relatedness matrix to choose will largely depend on the underlying genetic architecture of the given trait. Specifically, if SNPs with lower minor allele frequency tend to have larger effects (which is inversely proportional to its genotype variance), then the standardized genotype matrix is preferred. If the SNP effect size does not depend on its minor allele frequency, then the centered genotype matrix is preferred. In our previous experience based on a limited examples, we typically find the centered genotype matrix provides better control for population structure in lower organisms, and the two matrices seem to perform similarly in humans.
 ```
 
-Given this information, we'll use the `gk -1` option.
+Given this information, we'll use the `-gk 1` option.
 
 Run separate commands for each sample set:
 ```bash
