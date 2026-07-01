@@ -573,6 +573,191 @@ head *[t,d].fam
 
 The last file we need is the file of covariate data for each sample. We can create this from the multivariate dataset files.
 
+First make new directory for covariate files:
 ```bash
+mkdir /archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas/covariates
+```
 
+<br>
+
+Now construct covariate files for two model runs for each dataset:
+- a location-only run
+- and a full covariate run with location, depth, and prop_D
+
+<br>
+
+`create_covariate_files_for_gemma.R`:
+```r
+# Create covariate files for GEMMA analysis
+# Created: 2026-06-30
+# Last updated: 2026-06-30
+# Jason A. Toy
+
+
+rm(list = ls())
+
+setwd("/archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas/")
+
+library(tidyverse)
+
+
+
+# Load in files
+
+# PLINK .fam files
+fam_allramet <- read_delim("genotypes/pver_all_QDPSB_MISSMAF05filtered_genotypes_allramet.fam", col_names = FALSE, delim = " ")
+fam_cpruned <- read_delim("genotypes/pver_all_QDPSB_MISSMAF05filtered_genotypes_cpruned.fam", col_names = FALSE, delim = " ")
+
+
+# multivariate datasets
+mv_allramet <- read_tsv("starting_files/Pacu_complete_multivariate_dataset.tsv") %>% 
+  mutate(samplename_join = paste0(sample_name_withyear, "_1")) %>%
+  rename(location = Site) %>% 
+  arrange(samplename_join)
+  
+mv_cpruned <- read_tsv("starting_files/Pacu_complete_multivariate_dataset_clonepruned.tsv") %>% 
+  mutate(samplename_join = paste0(sample_name_withyear, "_1")) %>% 
+  rename(location = Site) %>% 
+  arrange(samplename_join)
+
+
+# join mv data to fam files
+covdat_allramet <- left_join(fam_allramet %>% select(X2),
+                             mv_allramet %>% select(samplename_join, location, depth_m_adj, prop_D),
+                             by = c("X2" = "samplename_join")) %>% 
+                    mutate(location = as.factor(location))
+
+covdat_cpruned <- left_join(fam_cpruned %>% select(X2),
+                            mv_cpruned %>% select(samplename_join, location, depth_m_adj, prop_D),
+                            by = c("X2" = "samplename_join")) %>% 
+                    mutate(location = as.factor(location))
+
+# Confirm row order still matches .fam
+identical(covdat_allramet$X2, fam_allramet$X2)
+identical(covdat_cpruned$X2, fam_cpruned$X2)
+
+
+
+# Build GEMMA covariate matrices
+# location-only model
+cov_allramet_location <- model.matrix(~ location, data = covdat_allramet) %>%
+  as.data.frame()
+
+cov_cpruned_location <- model.matrix(~ location, data = covdat_cpruned) %>%
+  as.data.frame()
+
+# full covariate model (location + depth + prop_D)
+cov_allramet_full <- model.matrix(~ location + depth_m_adj + prop_D, data = covdat_allramet) %>%
+  as.data.frame()
+
+cov_cpruned_full <- model.matrix(~ location + depth_m_adj + prop_D, data = covdat_cpruned) %>%
+  as.data.frame()
+
+
+# Double check for missing data
+colSums(is.na(cov_allramet_location))
+colSums(is.na(cov_cpruned_location))
+colSums(is.na(cov_allramet_full))
+colSums(is.na(cov_cpruned_full))
+
+
+# Write matrices to files
+write_tsv(cov_allramet_location,
+            "covariates/pacu_allramet_location.cov",
+            col_names = FALSE)
+
+write_tsv(cov_cpruned_location,
+            "covariates/pacu_cpruned_location.cov",
+            col_names = FALSE)
+
+write_tsv(cov_allramet_full,
+            "covariates/pacu_allramet_full.cov",
+            col_names = FALSE)
+
+write_tsv(cov_cpruned_full,
+            "covariates/pacu_cpruned_full.cov",
+            col_names = FALSE)
+
+
+# Write headers to file for reference
+writeLines(paste(colnames(cov_allramet_location), collapse = "\t"), 
+           "covariates/cov_headers_location.txt")
+
+writeLines(paste(colnames(cov_allramet_full), collapse = "\t"), 
+           "covariates/cov_headers_full.txt")
+```
+
+<br>
+
+Check outputs:
+```bash
+cd /archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas/covariates
+head *
+```
+```
+==> cov_headers_full.txt <==
+(Intercept)     locationAOAA    locationFALU    locationFASA    locationFTEL    locationLEON    locationMALO    locationOFU3    locationOFU6    locationVATI    depth_m_adj     prop_D
+
+==> cov_headers_location.txt <==
+(Intercept)     locationAOAA    locationFALU    locationFASA    locationFTEL    locationLEON    locationMALO    locationOFU3    locationOFU6    locationVATI
+
+==> pacu_allramet_full.cov <==
+1       0       0       0       0       0       0       0       0       0       1.194374406062931       0.99847154051494
+1       0       0       0       0       0       0       0       0       0       0.5843744060629309      0.6259102513578808
+1       0       0       0       0       0       0       0       0       0       0.8843744060629309      0.9994161771990658
+1       0       0       0       0       0       0       0       0       0       0.5843744060629309      0.6069589472178515
+1       0       0       0       0       0       0       0       0       0       0.5843744060629309      0.846115178668998
+1       0       0       0       0       0       0       0       0       0       0.8843744060629309      0.9771103306285576
+1       0       0       0       0       0       0       0       0       0       1.494374406062931       0.9960134062444876
+1       0       0       0       0       0       0       0       0       0       -0.02562559393706909    0.43400396712949846
+1       0       0       0       0       0       0       0       0       0       -0.02562559393706909    0.9975244841169456
+1       0       0       0       0       0       0       0       0       0       1.0643744060629308      0.9998140495867768
+
+==> pacu_allramet_location.cov <==
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+
+==> pacu_cpruned_full.cov <==
+1       0       0       0       0       0       0       0       0       0       0.5843744060629309      0.6259102513578808
+1       0       0       0       0       0       0       0       0       0       0.5843744060629309      0.846115178668998
+1       0       0       0       0       0       0       0       0       0       0.8843744060629309      0.9771103306285576
+1       0       0       0       0       0       0       0       0       0       1.494374406062931       0.9960134062444876
+1       0       0       0       0       0       0       0       0       0       -0.02562559393706909    0.43400396712949846
+1       0       0       0       0       0       0       0       0       0       -0.02562559393706909    0.9975244841169456
+1       0       0       0       0       0       0       0       0       0       4.264374406062931       0.9999080008586588
+1       0       0       0       0       0       0       0       0       0       0.21931268721400865     0.9331646891124096
+1       0       0       0       0       0       0       0       0       0       0.21931268721400865     0.6022631030892052
+1       0       0       0       0       0       0       0       0       0       -0.0806873127859914     1
+
+==> pacu_cpruned_location.cov <==
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+1       0       0       0       0       0       0       0       0       0
+```
+
+```bash
+wc -l *
+```
+```
+    1 cov_headers_full.txt
+    1 cov_headers_location.txt
+  366 pacu_allramet_full.cov
+  366 pacu_allramet_location.cov
+  132 pacu_cpruned_full.cov
+  132 pacu_cpruned_location.cov
 ```
