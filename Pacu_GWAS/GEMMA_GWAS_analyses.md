@@ -49,7 +49,7 @@ KIN=${BASEDIR}/kinship_matrix/output/pacu_allramet_gk1_kinship.cXX.txt
 # Covariate files: no header, same sample order as .fam, first column = intercept
 COV=${BASEDIR}/covariates/pacu_allramet_location.cov
 
-# Match this to your upstream max missingness threshold.
+# Match this to upstream max missingness/MAF thresholds.
 # GEMMA has its own SNP filters, so setting this prevents GEMMA's default missingness behavior from silently imposing a stricter filter than intended.
 MISS_GUARD=0.2
 MAF_GUARD=0.05
