@@ -570,7 +570,7 @@ NC_089319.1     1
 NC_089322.1     1
 NC_089325.1     1
 ```
-So the respresented chromosomes in the top 50 has actually changed a bit in the <u>full-covariate</u> model. Chromosome NC_089314 emerges as a one of the most represented chromosomes in the list, when it was not even present in the top 50 in the location-only run.
+So the respresented chromosomes in the top 50 has actually changed a bit in the <u>full-covariate</u> model. Chromosome NC_089314 emerges as a one of the most represented chromosomes in the list, when it was not even present in the top 50 in the location-only run. This likely represents a newly elevated regional peak.
 
 For reference, this was the breakdown of the top 50 SNPs from the <u>location-only</u> run:
 ```
