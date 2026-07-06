@@ -621,6 +621,33 @@ print(top_lrt_ARF %>%
 19 NC_089320.1  3762337 A       G       0.482 -0.205 0.0465   -190.   1.05  0.830 0.00000861  0.221           5.06                58
 20 NC_089322.1 12717198 A       G       0.317  0.249 0.0580   -190.   1.21  0.980 0.0000130   0.221           4.88                NA
 ```
+
+### Investigate candidate regions from all-ramet full model
+```
+   chr               ps
+   <chr>          <dbl>
+ 1 NC_089312.1 32935218   relaxin receptor 2-like
+ 2 NC_089313.1 16422646   rasGAP-activating-like protein 1
+ 3 NC_089313.1 16430922   
+ 4 NC_089313.1 16431423   mitotic-spindle organizing protein 2B-like
+ 5 NC_089313.1 16454151   oxysterol-binding protein 1-like
+ 6 NC_089313.1 16454204   oxysterol-binding protein 1-like
+ 7 NC_089313.1 16454567   oxysterol-binding protein 1-like
+ 8 NC_089317.1 20821793   patched domain-containing protein 3-like
+ 9 NC_089317.1 24929637   beta-galactosidase-1-like protein 3
+10 NC_089317.1 24929771 	beta-galactosidase-1-like protein 3
+11 NC_089317.1 24950999   uncharacterized LOC136281714
+12 NC_089317.1 24951439   uncharacterized LOC136281714
+13 NC_089317.1 24952099   uncharacterized LOC136281714, uncharacterized LOC136281715
+14 NC_089317.1 24953140   uncharacterized LOC136281715
+15 NC_089318.1 22675300   uncharacterized LOC136282620
+16 NC_089318.1 22676016   
+17 NC_089319.1  6346266   
+18 NC_089320.1  3762279   uncharacterized LOC131785903
+19 NC_089320.1  3762337   uncharacterized LOC131785903
+20 NC_089322.1 12717198   uncharacterized LOC131770041
+```
+
 <br>
 <br>
 <br>
