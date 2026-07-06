@@ -195,10 +195,13 @@ suggestive_p <- 1 / n_tests
 num_LDpruned_snps <- 74962 
 ld_aware_p <- 0.05 / num_LDpruned_snps
 
+# LD-aware 1/M threshold
+ld_sug_p <- 1 / num_LDpruned_snps
+
 
 thresholds_ARL <- tibble(
-  threshold = c("Bonferroni_0.05", "Suggestive_1_over_M", "LDaware_Bon_0.05"),
-  p_value = c(bonferroni_p, suggestive_p, ld_aware_p),
+  threshold = c("Bonferroni_0.05", "Suggestive_1_over_M", "LDaware_Bon_0.05", "LDaware_1_over_M"),
+  p_value = c(bonferroni_p, suggestive_p, ld_aware_p, ld_sug_p),
   neglog10_p = -log10(p_value)
 )
 
@@ -210,6 +213,7 @@ thresholds_ARL   # ARL = "all-ramet, location" model
  Bonferroni_0.05     0.0000000451       7.35
  Suggestive_1_over_M 0.000000903        6.04
  LDaware_Bon_0.05    0.000000667        6.18
+ LDaware_1_over_M    0.0000133          4.87
 ```
 
 <br>
@@ -225,28 +229,32 @@ allramet_location_fdr %>%
     n_q10 = sum(q_lrt < 0.10, na.rm = TRUE),
     n_bon = sum(p_lrt < bonferroni_p, na.rm = TRUE),
     n_sug = sum(p_lrt < suggestive_p, na.rm = TRUE),
-    n_LDaware = sum(p_lrt < ld_aware_p, na.rm = TRUE)
+    n_LDaware = sum(p_lrt < ld_aware_p, na.rm = TRUE),
+    n_LDsug = sum(p_lrt < ld_sug_p, na.rm = TRUE)
   )
 ```
 ```
-  n_snps    min_p_lrt min_q_lrt n_q05 n_q10 n_bon n_sug n_LDaware
-   <int>        <dbl>     <dbl> <int> <int> <int> <int>     <int>
- 1107867 0.0000000777    0.0860     0     1     0     3         1
+  n_snps    min_p_lrt min_q_lrt n_q05 n_q10 n_bon n_sug n_LDaware n_LDsug
+   <int>        <dbl>     <dbl> <int> <int> <int> <int>     <int>   <int>
+ 1107867 0.0000000777    0.0860     0     1     0     3         1      23
 ```
 - No SNPs reach the strict Bonferroni correction <0.05 cutoff
 - One SNP falls below the 0.10 cutoff
 - 3 SNPs fall below the 1/M "suggestive" cutoff
 - One SNP falls below the LD-aware 0.05 Bonferroni cutoff
+- 23 SNPs fall below the LD-aware 1/M suggestive cutoff
+
+The 1/M suggestive cutoffs are useful thresholds to use if few or no SNPs pass the strict Bonferroni cutoff. They essentially establish an error rate that allows for 1 expected false positive test across the whole set of tests.
 
 <br>
 
 ```
-# look at top SNPs
+# look at top SNPs (23 snps that meet LD-aware suggestive threshold)
 top_lrt_ARL <- allramet_location_fdr %>%
   arrange(p_lrt) %>%
-  slice_head(n = 50)
+  slice_head(n = 23)
 
-print(top_lrt_ARL, n = 50)
+print(top_lrt_ARL, n = 25)
 ```
 ```
    chr                    rs          ps n_miss allele1 allele0    af   beta     se logl_H1 l_remle l_mle      p_wald        p_lrt     p_score q_wald  q_lrt q_score neglog10_p_lrt neglog10_q_lrt
@@ -274,39 +282,12 @@ print(top_lrt_ARL, n = 50)
 21 NC_089316.1_Pverrucosa .      8354664      0 C       T       0.149  0.228 0.0526   -203.    1.21 0.920 0.0000184   0.0000130    0.0000481    0.466 0.331    0.726           4.88          0.480
 22 NC_089316.1_Pverrucosa .      8354849      0 T       C       0.149  0.228 0.0526   -203.    1.21 0.920 0.0000184   0.0000130    0.0000481    0.466 0.331    0.726           4.88          0.480
 23 NC_089316.1_Pverrucosa .      8355085      0 C       A       0.149  0.228 0.0526   -203.    1.21 0.920 0.0000184   0.0000130    0.0000481    0.466 0.331    0.726           4.88          0.480
-24 NC_089317.1_Pverrucosa .     16961919      0 C       T       0.238  0.235 0.0541   -203.    1.21 0.949 0.0000183   0.0000134    0.0000488    0.466 0.331    0.726           4.87          0.480
-25 NC_089319.1_Pverrucosa .      6346266      0 T       C       0.47   0.217 0.0503   -203.    1.30 1.04  0.0000211   0.0000137    0.0000386    0.466 0.331    0.726           4.86          0.480
-26 NC_089317.1_Pverrucosa .     20820495      0 G       T       0.157 -0.311 0.0725   -203.    1.49 1.25  0.0000227   0.0000140    0.0000273    0.466 0.331    0.726           4.85          0.480
-27 NC_089313.1_Pverrucosa .     16451713      0 A       G       0.056 -0.504 0.118    -203.    1.30 1.03  0.0000255   0.0000167    0.0000473    0.466 0.331    0.726           4.78          0.480
-28 NC_089313.1_Pverrucosa .     16451740      0 C       T       0.056 -0.504 0.118    -203.    1.30 1.03  0.0000255   0.0000167    0.0000473    0.466 0.331    0.726           4.78          0.480
-29 NC_089313.1_Pverrucosa .     16452410      0 G       C       0.056 -0.504 0.118    -203.    1.30 1.03  0.0000255   0.0000167    0.0000473    0.466 0.331    0.726           4.78          0.480
-30 NC_089313.1_Pverrucosa .     16452551      0 T       C       0.056 -0.504 0.118    -203.    1.30 1.03  0.0000255   0.0000167    0.0000473    0.466 0.331    0.726           4.78          0.480
-31 NC_089313.1_Pverrucosa .     16452663      0 G       A       0.056 -0.504 0.118    -203.    1.30 1.03  0.0000255   0.0000167    0.0000473    0.466 0.331    0.726           4.78          0.480
-32 NC_089313.1_Pverrucosa .     16452804      0 C       T       0.056 -0.504 0.118    -203.    1.30 1.03  0.0000255   0.0000167    0.0000473    0.466 0.331    0.726           4.78          0.480
-33 NC_089316.1_Pverrucosa .     26683763      0 G       A       0.105  0.330 0.0777   -203.    1.39 1.13  0.0000274   0.0000171    0.0000393    0.466 0.331    0.726           4.77          0.480
-34 NC_089313.1_Pverrucosa .     16454898      0 T       C       0.063 -0.458 0.108    -203.    1.44 1.18  0.0000285   0.0000174    0.0000364    0.466 0.331    0.726           4.76          0.480
-35 NC_089313.1_Pverrucosa .     16459172      0 A       G       0.063 -0.458 0.108    -203.    1.44 1.18  0.0000285   0.0000174    0.0000364    0.466 0.331    0.726           4.76          0.480
-36 NC_089313.1_Pverrucosa .     16460987      0 C       T       0.063 -0.458 0.108    -203.    1.44 1.18  0.0000285   0.0000174    0.0000364    0.466 0.331    0.726           4.76          0.480
-37 NC_089313.1_Pverrucosa .     16462287      0 T       C       0.063 -0.458 0.108    -203.    1.44 1.18  0.0000285   0.0000174    0.0000364    0.466 0.331    0.726           4.76          0.480
-38 NC_089313.1_Pverrucosa .     16465795      0 A       G       0.063 -0.458 0.108    -203.    1.44 1.18  0.0000285   0.0000174    0.0000364    0.466 0.331    0.726           4.76          0.480
-39 NC_089313.1_Pverrucosa .     16467790      0 A       C       0.063 -0.458 0.108    -203.    1.44 1.18  0.0000285   0.0000174    0.0000364    0.466 0.331    0.726           4.76          0.480
-40 NC_089317.1_Pverrucosa .     24929637      0 C       T       0.414  0.235 0.0558   -203.    1.46 1.20  0.0000324   0.0000199    0.0000397    0.466 0.331    0.726           4.70          0.480
-41 NC_089317.1_Pverrucosa .     24929771      0 T       G       0.414  0.235 0.0558   -203.    1.46 1.20  0.0000324   0.0000199    0.0000397    0.466 0.331    0.726           4.70          0.480
-42 NC_089317.1_Pverrucosa .     20819689      0 G       A       0.158 -0.305 0.0725   -203.    1.50 1.25  0.0000328   0.0000205    0.0000384    0.466 0.331    0.726           4.69          0.480
-43 NC_089317.1_Pverrucosa .     20819691      0 A       T       0.158 -0.305 0.0725   -203.    1.50 1.25  0.0000328   0.0000205    0.0000384    0.466 0.331    0.726           4.69          0.480
-44 NC_089317.1_Pverrucosa .     20819848      0 C       T       0.158 -0.305 0.0725   -203.    1.50 1.25  0.0000328   0.0000205    0.0000384    0.466 0.331    0.726           4.69          0.480
-45 NC_089317.1_Pverrucosa .     20820711      0 G       C       0.158 -0.305 0.0725   -203.    1.50 1.25  0.0000328   0.0000205    0.0000384    0.466 0.331    0.726           4.69          0.480
-46 NC_089317.1_Pverrucosa .     20820718      0 A       G       0.158 -0.305 0.0725   -203.    1.50 1.25  0.0000328   0.0000205    0.0000384    0.466 0.331    0.726           4.69          0.480
-47 NC_089317.1_Pverrucosa .     20820933      0 C       G       0.158 -0.305 0.0725   -203.    1.50 1.25  0.0000328   0.0000205    0.0000384    0.466 0.331    0.726           4.69          0.480
-48 NC_089317.1_Pverrucosa .     20821105      0 G       A       0.158 -0.305 0.0725   -203.    1.50 1.25  0.0000328   0.0000205    0.0000384    0.466 0.331    0.726           4.69          0.480
-49 NC_089317.1_Pverrucosa .     20821330      0 A       G       0.158 -0.305 0.0725   -203.    1.50 1.25  0.0000328   0.0000205    0.0000384    0.466 0.331    0.726           4.69          0.480
-50 NC_089317.1_Pverrucosa .     20821392      0 G       A       0.158 -0.305 0.0725   -203.    1.50 1.25  0.0000328   0.0000205    0.0000384    0.466 0.331    0.726           4.69          0.480
 ```
 
 <br>
 
 ```r
-# list chromosomes in top 50
+# list chromosomes with SNPs that meet LD-aware suggestive threshold
 top_lrt_ARL %>% 
   mutate(chr = str_remove(chr, "_Pverrucosa") %>% as.factor()) %>% 
   droplevels() %>% 
@@ -319,19 +300,18 @@ top_lrt_ARL %>%
   count(chr, sort = TRUE)
 ```
  ```
- "NC_089312.1" "NC_089313.1" "NC_089316.1" "NC_089317.1" "NC_089318.1" "NC_089319.1" "NC_089320.1"
+ "NC_089312.1" "NC_089313.1" "NC_089316.1" "NC_089317.1" "NC_089318.1" "NC_089320.1"
 
 
 
-chr             n
-<fct>       <int>
-NC_089313.1    18
-NC_089317.1    18
-NC_089316.1     4
-NC_089318.1     4
-NC_089320.1     4
-NC_089312.1     1
-NC_089319.1     1
+ chr             n
+ <fct>       <int>
+ NC_089313.1     6
+ NC_089317.1     5
+ NC_089318.1     4
+ NC_089320.1     4
+ NC_089316.1     3
+ NC_089312.1     1
 ```
 
 <br>
@@ -356,8 +336,7 @@ ggplot(qq_df_ARL, aes(x = expected, y = observed)) +
   ) +
   theme_bw()
 ```
-![alt text](image.png)
-
+![alt text](image-4.png)
 <br>
 
 Now look at the overall pattern of p-values across the genome (Manhattan plot):
@@ -369,7 +348,8 @@ ggplot(allramet_location_fdr %>%
        aes(x = ps/1e6, y = neglog10_p_lrt)) +
   geom_point(alpha = 0.25) +
   geom_hline(yintercept = 7.35, color = "red", linetype = "dashed", linewidth = 0.5) +
-  geom_hline(yintercept = 6.04, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = 6.04, color = "orange", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = 4.87, color = "black", linetype = "dashed", linewidth = 0.5) +
   facet_wrap(~ chr, scales = "free_x", nrow = 3) +
   labs(
     x = "Genomic position (Mbp)",
@@ -379,7 +359,7 @@ ggplot(allramet_location_fdr %>%
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
   ```
-![alt text](image-1.png)
+![alt text](image-5.png)
 
 <br>
 <br>
@@ -438,10 +418,13 @@ suggestive_p <- 1 / n_tests
 num_LDpruned_snps <- 74962 
 ld_aware_p <- 0.05 / num_LDpruned_snps
 
+# LD-aware 1/M threshold
+ld_sug_p <- 1 / num_LDpruned_snps
+
 
 thresholds <- tibble(
-  threshold = c("Bonferroni_0.05", "Suggestive_1_over_M", "LDaware_Bon_0.05"),
-  p_value = c(bonferroni_p, suggestive_p, ld_aware_p),
+  threshold = c("Bonferroni_0.05", "Suggestive_1_over_M", "LDaware_Bon_0.05", "LDaware_1_over_M"),
+  p_value = c(bonferroni_p, suggestive_p, ld_aware_p, ld_sug_p),
   neglog10_p = -log10(p_value)
 )
 
@@ -458,19 +441,21 @@ allramet_full_fdr %>%
     n_q10 = sum(q_lrt < 0.10, na.rm = TRUE),
     n_bon = sum(p_lrt < bonferroni_p, na.rm = TRUE),
     n_sug = sum(p_lrt < suggestive_p, na.rm = TRUE),
-    n_LDaware = sum(p_lrt < ld_aware_p, na.rm = TRUE)
+    n_LDaware = sum(p_lrt < ld_aware_p, na.rm = TRUE),
+    n_LDsug = sum(p_lrt < ld_sug_p, na.rm = TRUE)
   )
 ```
 ```
- n_snps   min_p_lrt min_q_lrt n_q05 n_q10 n_bon n_sug n_LDaware
-  <int>       <dbl>     <dbl> <int> <int> <int> <int>     <int>
-1107867 0.000000483     0.221     0     0     0     1         1
+  n_snps   min_p_lrt min_q_lrt n_q05 n_q10 n_bon n_sug n_LDaware n_LDsug
+   <int>       <dbl>     <dbl> <int> <int> <int> <int>     <int>   <int>
+ 1107867 0.000000483     0.221     0     0     0     1         1      20
 ```
 So now:
 - No SNPs reach the strict Bonferroni correction <0.05 cutoff
 - No SNPs fall below the 0.10 cutoff either
 - One SNPs fall below the 1/M "suggestive" cutoff
 - One SNP falls below the LD-aware 0.05 Bonferroni cutoff
+- 20 SNPs fall below the LD-aware 1/M suggestive cutoff
 
 <br>
 
@@ -478,9 +463,9 @@ So now:
 # look at top SNPs
 top_lrt_ARF <- allramet_full_fdr %>%
   arrange(p_lrt) %>%
-  slice_head(n = 50)
+  slice_head(n = 20)
 
-print(top_lrt_ARF, n = 50)
+print(top_lrt_ARF, n = 20)
 ```
 ```
    chr                    rs          ps n_miss allele1 allele0    af   beta     se logl_H1 l_remle l_mle      p_wald       p_lrt    p_score q_wald q_lrt q_score neglog10_p_lrt neglog10_q_lrt
@@ -505,42 +490,12 @@ print(top_lrt_ARF, n = 50)
 18 NC_089313.1_Pverrucosa .     16422646      0 T       C       0.171  0.299 0.0670   -190.   1.76  1.47  0.0000106   0.0000112   0.0000216   0.349 0.221   0.613           4.95          0.655
 19 NC_089322.1_Pverrucosa .     12717198      0 A       G       0.317  0.249 0.0580   -190.   1.21  0.980 0.0000228   0.0000130   0.0000278   0.349 0.221   0.613           4.88          0.655
 20 NC_089317.1_Pverrucosa .     24951439      0 T       C       0.418  0.207 0.0482   -190.   1.11  0.868 0.0000226   0.0000133   0.0000353   0.349 0.221   0.613           4.88          0.655
-21 NC_089317.1_Pverrucosa .     24512120      0 T       A       0.454 -0.199 0.0462   -190.   1.03  0.777 0.0000218   0.0000138   0.0000459   0.349 0.221   0.613           4.86          0.655
-22 NC_089317.1_Pverrucosa .     24929849      0 A       T       0.415  0.224 0.0524   -190.   1.23  0.991 0.0000242   0.0000138   0.0000283   0.349 0.221   0.613           4.86          0.655
-23 NC_089313.1_Pverrucosa .     16322950      0 T       C       0.078 -0.316 0.0740   -190.   1.15  0.903 0.0000251   0.0000143   0.0000344   0.349 0.221   0.613           4.84          0.655
-24 NC_089325.1_Pverrucosa .      2340401      0 T       G       0.311 -0.210 0.0492   -190.   1.32  1.07  0.0000253   0.0000147   0.0000267   0.349 0.221   0.613           4.83          0.655
-25 NC_089316.1_Pverrucosa .      8354664      0 C       T       0.149  0.213 0.0496   -190.   1.03  0.772 0.0000238   0.0000149   0.0000501   0.349 0.221   0.613           4.83          0.655
-26 NC_089316.1_Pverrucosa .      8354849      0 T       C       0.149  0.213 0.0496   -190.   1.03  0.772 0.0000238   0.0000149   0.0000501   0.349 0.221   0.613           4.83          0.655
-27 NC_089316.1_Pverrucosa .      8355085      0 C       A       0.149  0.213 0.0496   -190.   1.03  0.772 0.0000238   0.0000149   0.0000501   0.349 0.221   0.613           4.83          0.655
-28 NC_089318.1_Pverrucosa .     21725277      0 A       G       0.269 -0.230 0.0540   -190.   1.17  0.945 0.0000259   0.0000150   0.0000336   0.349 0.221   0.613           4.82          0.655
-29 NC_089314.1_Pverrucosa .     10722885      0 A       G       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-30 NC_089314.1_Pverrucosa .     10723074      0 T       C       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-31 NC_089314.1_Pverrucosa .     10725600      0 A       G       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-32 NC_089314.1_Pverrucosa .     10726467      0 T       A       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-33 NC_089314.1_Pverrucosa .     10727075      0 T       A       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-34 NC_089314.1_Pverrucosa .     10727729      0 T       G       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-35 NC_089314.1_Pverrucosa .     10727811      0 T       C       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-36 NC_089314.1_Pverrucosa .     10728850      0 T       C       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-37 NC_089314.1_Pverrucosa .     10735891      0 T       G       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-38 NC_089314.1_Pverrucosa .     10735971      0 A       T       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-39 NC_089314.1_Pverrucosa .     10736073      0 A       G       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-40 NC_089314.1_Pverrucosa .     10738033      0 T       C       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-41 NC_089314.1_Pverrucosa .     10738375      0 T       C       0.146  0.288 0.0673   -190.   1.04  0.810 0.0000240   0.0000151   0.0000482   0.349 0.221   0.613           4.82          0.655
-42 NC_089313.1_Pverrucosa .     16430923      0 C       A       0.124 -0.289 0.0681   -191.   1.15  0.918 0.0000277   0.0000161   0.0000375   0.349 0.221   0.613           4.79          0.655
-43 NC_089314.1_Pverrucosa .     10726982      0 A       G       0.149  0.276 0.0650   -191.   1.08  0.844 0.0000278   0.0000168   0.0000473   0.349 0.221   0.613           4.77          0.655
-44 NC_089312.1_Pverrucosa .     32794108      0 C       T       0.085  0.344 0.0805   -191.   0.987 0.758 0.0000247   0.0000172   0.0000651   0.349 0.221   0.613           4.76          0.655
-45 NC_089313.1_Pverrucosa .     16454898      0 T       C       0.063 -0.432 0.102    -191.   1.23  0.991 0.0000311   0.0000178   0.0000357   0.349 0.221   0.613           4.75          0.655
-46 NC_089313.1_Pverrucosa .     16459172      0 A       G       0.063 -0.432 0.102    -191.   1.23  0.991 0.0000311   0.0000178   0.0000357   0.349 0.221   0.613           4.75          0.655
-47 NC_089313.1_Pverrucosa .     16460987      0 C       T       0.063 -0.432 0.102    -191.   1.23  0.991 0.0000311   0.0000178   0.0000357   0.349 0.221   0.613           4.75          0.655
-48 NC_089313.1_Pverrucosa .     16462287      0 T       C       0.063 -0.432 0.102    -191.   1.23  0.991 0.0000311   0.0000178   0.0000357   0.349 0.221   0.613           4.75          0.655
-49 NC_089313.1_Pverrucosa .     16465795      0 A       G       0.063 -0.432 0.102    -191.   1.23  0.991 0.0000311   0.0000178   0.0000357   0.349 0.221   0.613           4.75          0.655
-50 NC_089313.1_Pverrucosa .     16467790      0 A       C       0.063 -0.432 0.102    -191.   1.23  0.991 0.0000311   0.0000178   0.0000357   0.349 0.221   0.613           4.75          0.655
 ```
 
 <br>
 
 ```r
-# list chromosomes in top 50
+# list chromosomes with SNPs that meet LD-aware suggestive threshold
 top_lrt_ARF %>% 
   mutate(chr = str_remove(chr, "_Pverrucosa") %>% as.factor()) %>% 
   droplevels() %>% 
@@ -553,36 +508,32 @@ top_lrt_ARF %>%
   count(chr, sort = TRUE)
 ```
 ```
-"NC_089312.1" "NC_089313.1" "NC_089314.1" "NC_089316.1" "NC_089317.1" "NC_089318.1" "NC_089319.1" "NC_089320.1" "NC_089322.1" "NC_089325.1"
+"NC_089312.1" "NC_089313.1" "NC_089317.1" "NC_089318.1" "NC_089319.1" "NC_089320.1" "NC_089322.1"
 
 
 
-chr             n
-<fct>       <int>
-NC_089313.1    14
-NC_089314.1    14
-NC_089317.1     9
-NC_089316.1     3
-NC_089318.1     3
-NC_089312.1     2
-NC_089320.1     2
-NC_089319.1     1
-NC_089322.1     1
-NC_089325.1     1
+ chr             n
+ <fct>       <int>
+ NC_089317.1     7
+ NC_089313.1     6
+ NC_089318.1     2
+ NC_089320.1     2
+ NC_089312.1     1
+ NC_089319.1     1
+ NC_089322.1     1
 ```
-So the respresented chromosomes in the top 50 has actually changed a bit in the <u>full-covariate</u> model. Chromosome NC_089314 emerges as a one of the most represented chromosomes in the list, when it was not even present in the top 50 in the location-only run. This likely represents a newly elevated regional peak.
+So the respresented chromosomes in the candidate list actually changed a bit in the <u>full-covariate</u> model. Chromosomes NC_089319 and NC_089322 now appear in the list, while NC_089316 is no longer present. This likely resulted from the additional factors in the models elevating some regional peaks and lowering others that were at least partially driven by these new factors.
 
 For reference, this was the breakdown of the top 50 SNPs from the <u>location-only</u> run:
 ```
 chr             n
 <fct>       <int>
-NC_089313.1    18
-NC_089317.1    18
-NC_089316.1     4
+NC_089313.1     6
+NC_089317.1     5
 NC_089318.1     4
 NC_089320.1     4
+NC_089316.1     3
 NC_089312.1     1
-NC_089319.1     1
 ```
 
 <br>
@@ -606,7 +557,7 @@ ggplot(qq_df_ARF, aes(x = expected, y = observed)) +
   ) +
   theme_bw()
 ```
-![alt text](image-2.png)
+![alt text](image-6.png)
 
 Adding depth and symbiont composition reduced the most extreme tail of the GWAS p-value distribution, suggesting that some location-only associations were partly aligned with these covariates. However, the full-covariate QQ plot still shows a broad excess of small p-values in the expected -log range of about 2 to 4.5, indicating that additional host-genomic, clonal, or residual (unmodeled) structure remains.
 
@@ -620,7 +571,8 @@ ggplot(allramet_full_fdr %>%
        aes(x = ps/1e6, y = neglog10_p_lrt)) +
   geom_point(alpha = 0.25) +
   geom_hline(yintercept = 7.35, color = "red", linetype = "dashed", linewidth = 0.5) +
-  geom_hline(yintercept = 6.04, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = 6.04, color = "orange", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = 4.87, color = "black", linetype = "dashed", linewidth = 0.5) +
   facet_wrap(~ chr, scales = "free_x", nrow = 3) +
   labs(
     x = "Genomic position (Mbp)",
@@ -630,4 +582,19 @@ ggplot(allramet_full_fdr %>%
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-![alt text](image-3.png)
+![alt text](image-7.png)
+
+<br>
+<br>
+<br>
+
+## Now let's move on to the clone-pruned dataset (132 ramets)
+### Location-only covariate model
+Again, start with a model that only has the one 'location' covariate.
+
+<br>
+
+`run_gemma_cpruned_location.slurm`:
+```bash
+
+```
