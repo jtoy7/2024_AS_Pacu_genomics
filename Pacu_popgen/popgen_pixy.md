@@ -316,6 +316,94 @@ So depth filtering removed more invariant sites on this chromosome than variant 
 <br>
 <br>
 
+Count total number of variant/invariant sites across chromosomes:
+```bash
+echo -e "Scaffold\tVariant_s
+ites\tInvariant_sites\tTotal_sites" > pixy_ready_site_counts.tsv
+
+for VCF in *.pixy_ready.vcf.gz; do
+
+    SCAF=${VCF%.pixy_ready.vcf.gz}
+
+    crun.bcftools bcftools query -f '%ALT\n' "$VCF" | \
+    awk -v scaf="$SCAF" '
+        $1 == "." {invariant++}
+        $1 != "." {variant++}
+        END {
+            print scaf "\t" variant+0 "\t" invariant+0 "\t" variant+invariant
+        }
+    ' >> pixy_ready_site_counts.tsv
+
+done
+```
+
+<br>
+
+`pixy_ready_site_counts.tsv`:
+| Scaffold                   | Variant_sites | Invariant_sites | Total_sites |
+|----------------------------|---------------|-----------------|-------------|
+| NC_089312.1_Pverrucosa     | 271452        | 20172532        | 20443984    |
+| NC_089313.1_Pverrucosa     | 141161        | 12477459        | 12618620    |
+| NC_089314.1_Pverrucosa     | 241576        | 18034983        | 18276559    |
+| NC_089315.1_Pverrucosa     | 217468        | 18140369        | 18357837    |
+| NC_089316.1_Pverrucosa     | 117313        | 9576545         | 9693858     |
+| NC_089317.1_Pverrucosa     | 138045        | 10829275        | 10967320    |
+| NC_089318.1_Pverrucosa     | 126604        | 13058179        | 13184783    |
+| NC_089319.1_Pverrucosa     | 172642        | 13694399        | 13867041    |
+| NC_089320.1_Pverrucosa     | 172160        | 14315858        | 14488018    |
+| NC_089321.1_Pverrucosa     | 149826        | 11991088        | 12140914    |
+| NC_089322.1_Pverrucosa     | 93692         | 8959628         | 9053320     |
+| NC_089323.1_Pverrucosa     | 111098        | 10484937        | 10596035    |
+| NC_089324.1_Pverrucosa     | 110014        | 9872963         | 9982977     |
+| NC_089325.1_Pverrucosa     | 151880        | 12937449        | 13089329    |
+| NW_027078161.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078162.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078163.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078164.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078165.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078166.1_Pverrucosa  | 6             | 4663            | 4669        |
+| NW_027078167.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078168.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078169.1_Pverrucosa  | 0             | 335             | 335         |
+| NW_027078170.1_Pverrucosa  | 0             | 1016            | 1016        |
+| NW_027078171.1_Pverrucosa  | 3             | 3009            | 3012        |
+| NW_027078172.1_Pverrucosa  | 0             | 416             | 416         |
+| NW_027078173.1_Pverrucosa  | 0             | 546             | 546         |
+| NW_027078174.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078175.1_Pverrucosa  | 0             | 1322            | 1322        |
+| NW_027078176.1_Pverrucosa  | 0             | 2643            | 2643        |
+| NW_027078177.1_Pverrucosa  | 0             | 564             | 564         |
+| NW_027078178.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078179.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078180.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078181.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078182.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078183.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078184.1_Pverrucosa  | 0             | 16              | 16          |
+| NW_027078185.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078186.1_Pverrucosa  | 0             | 263             | 263         |
+| NW_027078187.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078188.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078189.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078190.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078191.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078192.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078193.1_Pverrucosa  | 7             | 1270            | 1277        |
+| NW_027078194.1_Pverrucosa  | 1             | 3618            | 3619        |
+| NW_027078195.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078196.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078197.1_Pverrucosa  | 0             | 0               | 0           |
+| NW_027078198.1_Pverrucosa  | 0             | 0               | 0           |
+|                            |               |                 |             |
+| Non-chromosome totals      | 17            | 19681           | 19698       |
+|                            |               |                 |             |
+| Grand totals (all contigs) | 2214931       | 184545664       | 186760595   |
+|                            |               |                 |             |
+
+<br>
+<br>
+
+
 ## Run pixy
 
 We'll run three separate pixy commands that address three different groups of biological questions:

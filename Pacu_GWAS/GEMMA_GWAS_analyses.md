@@ -75,6 +75,23 @@ echo "Finished ${OUTPREFIX} GEMMA run"
 
 <br>
 
+Run output:
+```
+GEMMA 0.98.5 (2021-08-25) by Xiang Zhou, Pjotr Prins and team (C) 2012-2021
+Reading Files ...
+## number of total individuals = 366
+## number of analyzed individuals = 366
+## number of covariates = 10
+## number of phenotypes = 1
+## number of total SNPs/var        =  1107868
+## number of analyzed SNPs         =  1107867
+Start Eigen-Decomposition...
+pve estimate =0.368084
+se(pve) =0.0713352
+```
+
+<br>
+
 ### Full covariate model
 Now run the full covariate model that includes location, depth, and prop_D.
 
@@ -145,6 +162,22 @@ echo "Finished ${OUTPREFIX} GEMMA run"
 
 <br>
 
+Run output:
+```
+GEMMA 0.98.5 (2021-08-25) by Xiang Zhou, Pjotr Prins and team (C) 2012-2021
+Reading Files ...
+## number of total individuals = 366
+## number of analyzed individuals = 366
+## number of covariates = 12
+## number of phenotypes = 1
+## number of total SNPs/var        =  1107868
+## number of analyzed SNPs         =  1107867
+Start Eigen-Decomposition...
+pve estimate =0.329027
+se(pve) =0.0702668
+```
+
+<br>
 
 ### Summarize and explore the results from the two all-ramet model runs
 `summarize_explore_gemma_results.R`:
@@ -622,6 +655,8 @@ print(top_lrt_ARF %>%
 20 NC_089322.1 12717198 A       G       0.317  0.249 0.0580   -190.   1.21  0.980 0.0000130   0.221           4.88                NA
 ```
 
+<br>
+
 ### Investigate candidate regions from all-ramet full model
 ```
    chr               ps
@@ -635,7 +670,7 @@ print(top_lrt_ARF %>%
  7 NC_089313.1 16454567   oxysterol-binding protein 1-like
  8 NC_089317.1 20821793   patched domain-containing protein 3-like
  9 NC_089317.1 24929637   beta-galactosidase-1-like protein 3
-10 NC_089317.1 24929771 	beta-galactosidase-1-like protein 3
+10 NC_089317.1 24929771   beta-galactosidase-1-like protein 3
 11 NC_089317.1 24950999   uncharacterized LOC136281714
 12 NC_089317.1 24951439   uncharacterized LOC136281714
 13 NC_089317.1 24952099   uncharacterized LOC136281714, uncharacterized LOC136281715
@@ -724,3 +759,104 @@ crun.gemma gemma \
 
 echo "Finished ${OUTPREFIX} GEMMA run"
 ```
+
+<br>
+
+Run output:
+```
+GEMMA 0.98.5 (2021-08-25) by Xiang Zhou, Pjotr Prins and team (C) 2012-2021
+Reading Files ...
+## number of total individuals = 132
+## number of analyzed individuals = 132
+## number of covariates = 10
+## number of phenotypes = 1
+## number of total SNPs/var        =  1055527
+## number of analyzed SNPs         =  1055525
+Start Eigen-Decomposition...
+pve estimate =0.232968
+se(pve) =0.373793
+```
+
+<br>
+
+### Full covariate model
+Now run the full covariate model that includes location, depth, and prop_D.
+
+<br>
+
+`run_gemma_cpruned_full.slurm`:
+```bash
+#!/bin/bash
+
+#SBATCH --job-name=run_gemma_cpruned_full_2026-07-06
+#SBATCH --output=%A_%a_%x.out
+#SBATCH --error=%A_%a_%x.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=jtoy@odu.edu
+#SBATCH --partition=main
+#SBATCH --ntasks=1
+#SBATCH --mem=100G
+#SBATCH --time=5-00:00:00
+#SBATCH --cpus-per-task=1
+
+set -euo pipefail
+
+
+# Load GEMMA module
+module load container_env gemma/0.98.5
+
+# Define paths
+BASEDIR=/archive/barshis/barshislab/jtoy/pver_gwas/gemma_gwas
+
+# Output directories
+OUTPREFIX='cpruned_full'
+OUTBASE=${BASEDIR}/gemma_results/lmm/${OUTPREFIX}
+mkdir -p "${OUTBASE}"
+
+
+# Dense, non-LD-pruned, MAF>0.05 PLINK prefixes for association testing
+BFILE=${BASEDIR}/genotypes/pver_all_QDPSB_MISSMAF05filtered_genotypes_cpruned
+
+# Kinship matrices generated from subsetted, LD-pruned, MAF>0.05 PLINK files
+KIN=${BASEDIR}/kinship_matrix/output/pacu_cpruned_gk1_kinship.cXX.txt
+
+# Covariate files: no header, same sample order as .fam, first column = intercept
+COV=${BASEDIR}/covariates/pacu_cpruned_full.cov
+
+# Match this to upstream max missingness/MAF thresholds.
+# GEMMA has its own SNP filters, so setting this prevents GEMMA's default missingness behavior from silently imposing a stricter filter than intended.
+MISS_GUARD=0.2
+MAF_GUARD=0.05
+
+# Move to working directory
+cd "${OUTBASE}"
+
+# Run GEMMA LMM
+# -----------------------------
+crun.gemma gemma \
+  -bfile "${BFILE}" \
+  -n 1 \
+  -k "${KIN}" \
+  -c "${COV}" \
+  -maf "${MAF_GUARD}" \
+  -miss "${MISS_GUARD}" \
+  -lmm 4 \
+  -outdir "${OUTBASE}" \
+  -o "${OUTPREFIX}_lmm"
+
+echo "Finished ${OUTPREFIX} GEMMA run"
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
