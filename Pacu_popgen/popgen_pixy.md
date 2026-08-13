@@ -5782,7 +5782,7 @@ Cluster Composition	Cluster Ancestor	Representative sequence	Max Score	Total Sco
 <br>
 
 #### OFU6 candidate region NC_089315.1_21190001-21260000 :
-- There are 6 annotated genes within this region, both on the minus strand:
+- There are 6 annotated genes within this region, across both the plus and minus strands:
 ```
 NC_089315.1:21185958-21197996 (minus) - leucine-rich repeat-containing protein 49 
 NC_089315.1:21207514-21213867 (plus)  - tetraspanin-36-like 
