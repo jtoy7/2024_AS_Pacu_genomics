@@ -5694,9 +5694,8 @@ This was the only other q999 window on this chromosome, but is isolated from the
 
 | Accession   | Begin    | End      | Chromosome | Orientation | Name                         | Symbol       | Gene ID  | Gene Type      | Transcripts accession | Protein accession | Protein length |
 |-------------|----------|----------|------------|-------------|------------------------------|--------------|----------|----------------|-----------------------|-------------------|----------------|
-| NC_089313.1 | 17875875 | 17887250 | 2          | minus       | beta-1,3-glucosyltransferase | LOC131790554 | 1.32E+08 | protein-coding | XM_059107768.2        | XP_058963751.2    | 485            |
-| NC_089313.1 | 17881970 | 17883167 | 2          | plus        | histone H2B.3-like           | LOC131790555 | 1.32E+08 | pseudogene     |                       |                   |                |
-| NC_089313.1 | 17887348 | 17893236 | 2          | plus        | protein rogdi homolog        | LOC131790725 | 1.32E+08 | protein-coding | XM_059107989.2        | XP_058963972.2    | 288            |
+| NC_089312.1 | 36051463 | 36056422 | 1          | plus        | uncharacterized LOC131798457 | LOC131798457 | 1.32E+08 | protein-coding | XM_059116103.2        | XP_058972086.2    | 930            |
+| NC_089312.1 | 36054355 | 36059092 | 1          | minus       | uncharacterized LOC136283090 | LOC136283090 | 1.36E+08 | lncRNA         | XR_010718543.1        |                   |                |
 
 A blast of the protein sequence does not yield many useful hits, but a number of hits are for "putative serine/threonine-protein kinase pats1" or similar.
 
