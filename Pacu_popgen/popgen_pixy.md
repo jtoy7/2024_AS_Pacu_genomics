@@ -5798,11 +5798,21 @@ NC_089313.1:3673614-3698834 (minus) - probable ATP-dependent RNA helicase DDX60 
 ```
 DDX60 is involved in antiviral immunity and RNA helicase-dependent signaling (GeneCards). Binds ssRNA, dsRNA and dsDNA and can promote the binding of RIGI to dsRNA. Selectively reduces infectious titers of viruses that depend on type II IRES-mediated translation by modulating ribosome occupancy on type II IRES-containing viral mRNAs, without affecting type I IRES-mediated translation (UniProt).
 
+<br>
 
+#### OFU6 candidate region NC_089313.1_17880001_17890000:
+There is only one other window on this chromosome that passes the q999 threshold, so might as well take a look at it.
+-There are three annotated features overlapping this window, 2 protein-coding genes and one pseudogene:
 
+| Accession   | Begin    | End      | Chromosome | Orientation | Name                         | Symbol       | Gene ID  | Gene Type      | Transcripts accession | Protein accession | Protein length |
+|-------------|----------|----------|------------|-------------|------------------------------|--------------|----------|----------------|-----------------------|-------------------|----------------|
+| NC_089313.1 | 17875875 | 17887250 | 2          | minus       | beta-1,3-glucosyltransferase | LOC131790554 | 1.32E+08 | protein-coding | XM_059107768.2        | XP_058963751.2    | 485            |
+| NC_089313.1 | 17881970 | 17883167 | 2          | plus        | histone H2B.3-like           | LOC131790555 | 1.32E+08 | pseudogene     |                       |                   |                |
+| NC_089313.1 | 17887348 | 17893236 | 2          | plus        | protein rogdi homolog        | LOC131790725 | 1.32E+08 | protein-coding | XM_059107989.2        | XP_058963972.2    | 288            |
 
+Beta-1,3-glucosyltransferase (B3glct) is involved in modification of thrombospondin type-1 repeats (TSRs) in the ER. It ensures proper folding, stability, and signaling activity of TSR-containing proteins. Many of its substrates are ADAMTS/ADAMTS-like metalloproteases and thrombospondin-related proteins, which participate in extracellular-matrix organization, cell adhesion and migration, morphogenesis, and tissue remodeling. Allelic differences in this gene could influence folding or secretion of TSR proteins under thermal or oxidative stress, which could in turn promote tissue integrity under differing thermal environments.
 
-
+(ROGDI) is a component of the Rabconnectin-3 complex involved in the assembly and activation of vacuolar-type H⁺-ATPases (V-ATPases), which are proton pumps that acidify lysosomes, endosomes, Golgi-derived compartments, and other intracellular vesicles (<a href="https://www.jbc.org/article/S0021-9258(25)00230-3/fulltext">Winkley & Kane 2025</a>). The overlap of this gene with the candidate window suggests potential effects on lysosomal degradation (protein turnover) and intracellular pH regulation. Interestingly, V-type H⁺-ATPase also acidifies the host-derived symbiosome surrounding Symbiodiniaceae. That acidification concentrates CO₂ and promotes algal photosynthesis (<a href="https://www.pnas.org/doi/10.1073/pnas.1413483112?url_ver=Z39.88-2003&rfr_id=ori:rid:crossref.org&rfr_dat=cr_pub%20%200pubmed">Barott et al. 2015</a>).
 
 
 <br>
