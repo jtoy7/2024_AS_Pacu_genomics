@@ -5689,6 +5689,21 @@ Chitin synthase in corals is most likely involved in skeletogenesis and biominer
 
 <br>
 
+#### OFU3 candidate region NC_089312.1:36050001-36060000 :
+This was the only other q999 window on this chromosome, but is isolated from the others. This region overlaps two annotated features, one uncharacterized protein-coding gene and one uncharacterized lncRNA sequence:
+
+| Accession   | Begin    | End      | Chromosome | Orientation | Name                         | Symbol       | Gene ID  | Gene Type      | Transcripts accession | Protein accession | Protein length |
+|-------------|----------|----------|------------|-------------|------------------------------|--------------|----------|----------------|-----------------------|-------------------|----------------|
+| NC_089313.1 | 17875875 | 17887250 | 2          | minus       | beta-1,3-glucosyltransferase | LOC131790554 | 1.32E+08 | protein-coding | XM_059107768.2        | XP_058963751.2    | 485            |
+| NC_089313.1 | 17881970 | 17883167 | 2          | plus        | histone H2B.3-like           | LOC131790555 | 1.32E+08 | pseudogene     |                       |                   |                |
+| NC_089313.1 | 17887348 | 17893236 | 2          | plus        | protein rogdi homolog        | LOC131790725 | 1.32E+08 | protein-coding | XM_059107989.2        | XP_058963972.2    | 288            |
+
+A blast of the protein sequence does not yield many useful hits, but a number of hits are for "putative serine/threonine-protein kinase pats1" or similar.
+
+<br>
+<br>
+
+
 #### OFU3 candidate region NC_089315.1_1740001_1750000 :
 - There are three annotated features within this region, one on the plus strand and two on the minus strand:
 ```
