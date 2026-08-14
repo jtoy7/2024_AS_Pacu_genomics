@@ -5406,7 +5406,7 @@ head(cand_windows_c15, 10)
  9 OFU3  OFU6  NC_089315.1     21240001     21250000 NC_08931… OFU3_OFU6      106          0.237    0.00316              8483    0.00241              8483 0.00365         8483        0.199                   8483        -1.04                   8483  7.48e-4    1.24  FALSE    
 10 OFU3  OFU6  NC_089315.1     21250001     21260000 NC_08931… OFU3_OFU6       94          0.227    0.00250              8050    0.00241              8050 0.00317         8050       -0.0891                  8050        -0.759                  8050  9.32e-5    0.670 FALSE  
 ```
-There are three q999 windows within a 40kb region (plus two more contiguous windows immediately following with Fst just below the q999 cutoff but >0.220), and five q999 windows within a 430kb region
+There are three q999 windows within a 50kb region (plus two more contiguous windows immediately following with Fst just below the q999 cutoff but >0.220), and five q999 windows within a 430kb region
 
 <br>
 
@@ -5799,6 +5799,38 @@ These genes are genearlly realted to **membrane organization**, **vesicle traffi
 - SYNRG encodes **synergin gamma**, a binding protein that interacts with the gamma subunit of the AP1 clathrin-adaptor complex and helps connect AP1 to other proteins. AP1 is located at the trans-Golgi network and associates specific proteins with clathrin-coated vesicles, placing SYNRG in the machinery that organizes vesicle trafficking (Genecards).
 - CENPW encodes **Centromere Protein W**, a core kinetochore assembly factor required for accurate chromosome segregation and mitotic progression. It is an essential component of the CENPA-NAC and CENP-T-W-S-X complexes, which bind H3-containing centromeric nucleosomes and supercoil DNA to enable kinetochore formation. Through this role, CENPW helps build the inner kinetochore and supports cell cycle progression (GeneCards).
 - PMPCA encodes the **alpha subunit of the mitochondrial processing peptidase**, a metallopeptidase that cleaves transit peptides from nuclear-encoded mitochondrial proteins. It functions in the mitochondrion as part of a proteolytic heterodimer and is central to mitochondrial protein processing and localization. Mechanistically, PMPCA participates in proteolysis and protein processing during import of mitochondrial precursors, thereby supporting the maturation of proteins targeted to the mitochondrion. Its involvement is also linked to transport of small molecules, protein localization, and metabolism of proteins (GeneCards). 
+
+
+<br>
+<br>
+
+#### OFU6 candidate region NC_089315.1: 21600001-21620000 :
+- There are 2 annotated genes within this region, one on each strand:
+
+| Accession   | Begin    | End      | Chromosome | Orientation | Name                         | Symbol       | Gene ID  | Gene Type      | Transcripts accession | Protein accession | Protein length |
+|-------------|----------|----------|------------|-------------|------------------------------|--------------|----------|----------------|-----------------------|-------------------|----------------|
+| NC_089315.1 | 21601030 | 21610454 | 4          | plus        | uncharacterized LOC131778687 | LOC131778687 | 1.32E+08 | protein-coding | XM_059095090.2        | XP_058951073.1    | 386            |
+| NC_089315.1 | 21611182 | 21625433 | 4          | minus       | laminin subunit gamma-1      | LOC131778736 | 1.32E+08 | protein-coding | XM_059095183.2        | XP_058951166.2    | 1618           |
+
+A blast of the uncharacterized protein indicates similarity to "Neural proliferation differentiation control-1 protein (npdc1)".
+
+Laminin subunit gamma-1 is an extracellular-matrix protein that forms part of the laminin heterotrimer. Laminin complexes mediate basement-membrane assembly, epithelial attachment, and tissue organization. Plausible roles are therefore in tissue integrity, morphogenesis, and wound repair.
+
+<br>
+<br>
+
+
+#### OFU6 candidate region NC_089315.1: 24370001-24390000 :
+- There are 2 annotated genes within this region, both on the plus strand:
+
+| Accession   | Begin    | End      | Chromosome | Orientation | Name                                        | Symbol       | Gene ID  | Gene Type      | Transcripts accession | Protein accession | Protein length |
+|-------------|----------|----------|------------|-------------|---------------------------------------------|--------------|----------|----------------|-----------------------|-------------------|----------------|
+| NC_089315.1 | 24347338 | 24376853 | 4          | plus        | neurogenic locus notch homolog protein 1    | LOC131779349 | 1.32E+08 | protein-coding | XM_059095890.2        | XP_058951873.2    | 2133           |
+| NC_089315.1 | 24385866 | 24447758 | 4          | plus        | intermembrane lipid transfer protein VPS13A | LOC131779380 | 1.32E+08 | protein-coding | XM_059095930.2        | XP_058951913.2    | 3576           |
+
+Neurogenic locus notch homolog protein 1 (notch1) is a cell-contact receptor that regulates cell-fate specification, differentiation, and tissue patterning.
+
+Intermembrane lipid transfer protein VPS13A is a bridge-like protein that is involved in lipid storage, membrane homeostasis, and maintenance of mitochondrial morphology.
 
 
 <br>
