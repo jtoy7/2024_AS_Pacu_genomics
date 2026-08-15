@@ -6377,9 +6377,36 @@ cand_reg_deltatd_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+# plot FTEL td
+cand_reg_tdFTEL_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = tajima_d_FTEL)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "FTEL Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot ALOF td
+cand_reg_tdALOF_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = tajima_d_ALOF)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "ALOF Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 # plot dxy
 cand_reg_dxy_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = avg_dxy)) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
@@ -6396,82 +6423,121 @@ cand_reg_dxy_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6,
 plot_grid(cand_reg_fst_FTELALOF + labs(x = NULL),
           cand_reg_deltapi_FTELALOF + labs(x = NULL),
           cand_reg_deltatd_FTELALOF + labs(x = NULL),
+          cand_reg_tdFTEL_FTELALOF + labs(x = NULL),
+          cand_reg_tdALOF_FTELALOF + labs(x = NULL),
           cand_reg_dxy_FTELALOF,
           ncol = 1,
           align = "v",
           axis = "lr"
 )
 ```
-![alt text](image-142.png)
+![alt text](image-143.png)
 
-Two regions stand out as the most promising sweep candidates:
-- NC_089320.1_20860001-20960000 (six q99 windows, including one q999 window; high FST, high delta pi, high delta TD)
+A few regions stand out as the most promising sweep candidates:
+- NC_089320.1_20860001-20960000 (six q99 windows, including one q999 window; high FST, high delta pi, high delta TD (very negative ALOF TD))
 - NC_089315.1_29180001-29250000 (five q99 windows, including two q999 windows; high FST, low delta pi, lower delta TD)
+- NC_089315.1_28770001-28780000 (one q999 window; high FST, negative delta pi, negative delta TD)
+- NC_089312.1_15300001-15310000 (high FST, positive delta pi, positive delta TD (negative ALOF TD))
 - Two of the highest FST outliers are also adjacent windows on chromosome NC_089319.1 (7940001-7960000), but they do not exhibit as clean of a sweep pattern in delta pi and delta TD. Delta pi is negative, but delta TD is positive. This suggests that this peak may reflect differentiation of an older or standing haplotype, linked selection in a low-recombination region, or other local allele-frequency-spectrum effects rather than a classic sweep.
 
 <br>
 
 ```r
-cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" & candidate_q99 == TRUE) %>% select(pop1, pop2, window_id, window_pos_1, avg_hudson_fst, avg_dxy, delta_pi, delta_td, candidate_q99, candidate_q999)
+cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" & candidate_q99 == TRUE) %>% select(pop1, pop2, window_id, window_pos_1, avg_hudson_fst, avg_dxy, delta_pi, delta_td, tajima_d_FTEL, tajima_d_ALOF, candidate_q99, candidate_q999)
 ```
 ```
-   pop1  pop2  window_id                     window_pos_1 avg_hudson_fst  avg_dxy   delta_pi delta_td candidate_q99 candidate_q999
-   <fct> <fct> <chr>                                <dbl>          <dbl>    <dbl>      <dbl>    <dbl> <lgl>         <lgl>         
- 1 ALOF  FTEL  NC_089315.1_13520001_13530000     13520001          0.158 0.00160  -0.000170    0.967  TRUE          FALSE         
- 2 ALOF  FTEL  NC_089315.1_15310001_15320000     15310001          0.248 0.00287  -0.000636    0.306  TRUE          TRUE          
- 3 ALOF  FTEL  NC_089315.1_15330001_15340000     15330001          0.149 0.00135  -0.000636   -0.447  TRUE          FALSE         
- 4 ALOF  FTEL  NC_089315.1_15340001_15350000     15340001          0.152 0.00478  -0.00103    -0.313  TRUE          FALSE         
- 5 ALOF  FTEL  NC_089315.1_15500001_15510000     15500001          0.205 0.00111  -0.000613   -0.963  TRUE          FALSE         
- 6 ALOF  FTEL  NC_089315.1_15520001_15530000     15520001          0.190 0.000696 -0.000152    0.0530 TRUE          FALSE         
- 7 ALOF  FTEL  NC_089315.1_28610001_28620000     28610001          0.164 0.000369 -0.0000332   0.456  TRUE          FALSE         
- 8 ALOF  FTEL  NC_089315.1_28770001_28780000     28770001          0.256 0.00218  -0.000899   -0.969  TRUE          TRUE          
- 9 ALOF  FTEL  NC_089315.1_28880001_28890000     28880001          0.158 0.00131  -0.0000394   0.345  TRUE          FALSE         
-10 ALOF  FTEL  NC_089315.1_28940001_28950000     28940001          0.165 0.00189  -0.000728   -0.169  TRUE          FALSE         
-11 ALOF  FTEL  NC_089315.1_29180001_29190000     29180001          0.181 0.00242  -0.000569    0.862  TRUE          FALSE         
-12 ALOF  FTEL  NC_089315.1_29190001_29200000     29190001          0.268 0.00346  -0.00171    -0.623  TRUE          TRUE          
-13 ALOF  FTEL  NC_089315.1_29200001_29210000     29200001          0.224 0.00269  -0.00168    -0.328  TRUE          FALSE         
-14 ALOF  FTEL  NC_089315.1_29230001_29240000     29230001          0.247 0.00247  -0.00101     0.214  TRUE          TRUE          
-15 ALOF  FTEL  NC_089315.1_29240001_29250000     29240001          0.210 0.00380  -0.00136    -0.0424 TRUE          FALSE         
-16 ALOF  FTEL  NC_089315.1_29320001_29330000     29320001          0.156 0.00160   0.000145    1.63   TRUE          FALSE         
-17 ALOF  FTEL  NC_089315.1_30530001_30540000     30530001          0.261 0.00485  -0.000616   -0.164  TRUE          TRUE  
+   pop1  pop2  window_id                     window_pos_1 avg_hudson_fst  avg_dxy   delta_pi delta_td tajima_d_FTEL tajima_d_ALOF candidate_q99 candidate_q999
+   <fct> <fct> <chr>                                <dbl>          <dbl>    <dbl>      <dbl>    <dbl>         <dbl>         <dbl> <lgl>         <lgl>         
+ 1 ALOF  FTEL  NC_089312.1_1040001_1050000        1040001          0.175 0.00102  -0.000545     0.635        0.240        -0.396  TRUE          FALSE         
+ 2 ALOF  FTEL  NC_089312.1_3920001_3930000        3920001          0.162 0.00109   0.000429     2.08         1.84         -0.242  TRUE          FALSE         
+ 3 ALOF  FTEL  NC_089312.1_7750001_7760000        7750001          0.163 0.00244  -0.000658     0.414       -0.103        -0.517  TRUE          FALSE         
+ 4 ALOF  FTEL  NC_089312.1_7910001_7920000        7910001          0.234 0.000432  0.0000449    0.219       -0.344        -0.563  TRUE          TRUE          
+ 5 ALOF  FTEL  NC_089312.1_10170001_10180000     10170001          0.229 0.00130  -0.0000471   -0.190       -0.581        -0.391  TRUE          TRUE          
+ 6 ALOF  FTEL  NC_089312.1_11540001_11550000     11540001          0.165 0.00327   0.000571     1.06         0.876        -0.183  TRUE          FALSE         
+ 7 ALOF  FTEL  NC_089312.1_14890001_14900000     14890001          0.178 0.00122  -0.000548    -0.902       -2.20         -1.30   TRUE          FALSE         
+ 8 ALOF  FTEL  NC_089312.1_15000001_15010000     15000001          0.152 0.00130  -0.000242    -0.257       -1.69         -1.43   TRUE          FALSE         
+ 9 ALOF  FTEL  NC_089312.1_15010001_15020000     15010001          0.182 0.00179  -0.000555    -1.28        -0.986         0.298  TRUE          FALSE         
+10 ALOF  FTEL  NC_089312.1_15090001_15100000     15090001          0.149 0.000917  0.0000216   -0.145       -0.760        -0.615  TRUE          FALSE         
+11 ALOF  FTEL  NC_089312.1_15190001_15200000     15190001          0.191 0.00154   0.000260     0.241       -0.670        -0.911  TRUE          FALSE         
+12 ALOF  FTEL  NC_089312.1_15300001_15310000     15300001          0.232 0.000605  0.0000490    1.25         0.301        -0.949  TRUE          TRUE          
+13 ALOF  FTEL  NC_089312.1_15420001_15430000     15420001          0.196 0.00239   0.0000328    0.167       -0.589        -0.755  TRUE          FALSE         
+14 ALOF  FTEL  NC_089312.1_15430001_15440000     15430001          0.171 0.00373  -0.0000651    0.219        0.815         0.597  TRUE          FALSE         
+15 ALOF  FTEL  NC_089312.1_15650001_15660000     15650001          0.164 0.00231  -0.000847    -1.74        -0.156         1.59   TRUE          FALSE         
+16 ALOF  FTEL  NC_089312.1_15720001_15730000     15720001          0.159 0.00120   0.000247     0.222        0.379         0.157  TRUE          FALSE         
+17 ALOF  FTEL  NC_089312.1_15750001_15760000     15750001          0.219 0.000749  0.000181     0.494        0.609         0.115  TRUE          FALSE         
+18 ALOF  FTEL  NC_089312.1_16100001_16110000     16100001          0.166 0.000466 -0.0000426    0.360        1.63          1.27   TRUE          FALSE         
+19 ALOF  FTEL  NC_089312.1_16600001_16610000     16600001          0.156 0.00217   0.000351     1.54         0.685        -0.853  TRUE          FALSE         
+20 ALOF  FTEL  NC_089312.1_16630001_16640000     16630001          0.170 0.00224   0.000632     1.35        -0.0531       -1.41   TRUE          FALSE         
+21 ALOF  FTEL  NC_089312.1_16640001_16650000     16640001          0.220 0.00219   0.00131      1.95         0.124        -1.82   TRUE          FALSE         
+22 ALOF  FTEL  NC_089312.1_16660001_16670000     16660001          0.191 0.000989  0.000476     1.41         0.176        -1.24   TRUE          FALSE         
+23 ALOF  FTEL  NC_089312.1_16670001_16680000     16670001          0.166 0.00156   0.000559     1.46         0.181        -1.28   TRUE          FALSE         
+24 ALOF  FTEL  NC_089312.1_16690001_16700000     16690001          0.157 0.00481   0.00136      0.938       -0.502        -1.44   TRUE          FALSE         
+25 ALOF  FTEL  NC_089312.1_17580001_17590000     17580001          0.159 0.00398   0.00192      2.12         0.410        -1.71   TRUE          FALSE         
+26 ALOF  FTEL  NC_089312.1_18030001_18040000     18030001          0.150 0.00184  -0.00205     -2.83        -2.47          0.357  TRUE          FALSE         
+27 ALOF  FTEL  NC_089312.1_18050001_18060000     18050001          0.154 0.00160  -0.00160     -2.37        -2.38         -0.0118 TRUE          FALSE 
 ```
 
 ```r
-cand_windows_FTELALOF %>% filter(chromosome == "NC_089320.1" & candidate_q99 == TRUE) %>% select(pop1, pop2, window_id, window_pos_1, avg_hudson_fst, avg_dxy, delta_pi, delta_td, candidate_q99, candidate_q999)
+cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" & candidate_q99 == TRUE) %>% select(pop1, pop2, window_id, window_pos_1, avg_hudson_fst, avg_dxy, delta_pi, delta_td, tajima_d_FTEL, tajima_d_ALOF, candidate_q99, candidate_q999)
 ```
 ```
-   pop1  pop2  window_id                     window_pos_1 avg_hudson_fst  avg_dxy   delta_pi delta_td candidate_q99 candidate_q999
-   <fct> <fct> <chr>                                <dbl>          <dbl>    <dbl>      <dbl>    <dbl> <lgl>         <lgl>         
- 1 ALOF  FTEL  NC_089320.1_3720001_3730000        3720001          0.154 0.00384  -0.00177     -0.564 TRUE          FALSE         
- 2 ALOF  FTEL  NC_089320.1_4530001_4540000        4530001          0.151 0.00147  -0.000364    -0.369 TRUE          FALSE         
- 3 ALOF  FTEL  NC_089320.1_10200001_10210000     10200001          0.152 0.00279   0.00110      2.62  TRUE          FALSE         
- 4 ALOF  FTEL  NC_089320.1_10210001_10220000     10210001          0.229 0.00407   0.000602     0.953 TRUE          TRUE          
- 5 ALOF  FTEL  NC_089320.1_10220001_10230000     10220001          0.164 0.00171   0.0000811    0.887 TRUE          FALSE         
- 6 ALOF  FTEL  NC_089320.1_10230001_10240000     10230001          0.198 0.00160   0.000234     1.44  TRUE          FALSE         
- 7 ALOF  FTEL  NC_089320.1_10240001_10250000     10240001          0.173 0.00361   0.000600     1.11  TRUE          FALSE         
- 8 ALOF  FTEL  NC_089320.1_10330001_10340000     10330001          0.216 0.00424   0.000409     0.553 TRUE          FALSE         
- 9 ALOF  FTEL  NC_089320.1_10370001_10380000     10370001          0.198 0.000525  0.0000981    1.21  TRUE          FALSE         
-10 ALOF  FTEL  NC_089320.1_10380001_10390000     10380001          0.202 0.00122   0.000150     1.51  TRUE          FALSE         
-11 ALOF  FTEL  NC_089320.1_10390001_10400000     10390001          0.192 0.00144   0.000573     1.92  TRUE          FALSE         
-12 ALOF  FTEL  NC_089320.1_10520001_10530000     10520001          0.172 0.00114   0.000342     1.32  TRUE          FALSE         
-13 ALOF  FTEL  NC_089320.1_10530001_10540000     10530001          0.171 0.00194   0.000775     2.06  TRUE          FALSE         
-14 ALOF  FTEL  NC_089320.1_10550001_10560000     10550001          0.180 0.00184  -0.000170    -0.281 TRUE          FALSE         
-15 ALOF  FTEL  NC_089320.1_10570001_10580000     10570001          0.162 0.00331   0.00154      2.53  TRUE          FALSE         
-16 ALOF  FTEL  NC_089320.1_10580001_10590000     10580001          0.168 0.00361   0.00173      1.66  TRUE          FALSE         
-17 ALOF  FTEL  NC_089320.1_11370001_11380000     11370001          0.149 0.00251   0.000596     1.61  TRUE          FALSE         
-18 ALOF  FTEL  NC_089320.1_13410001_13420000     13410001          0.153 0.00206  -0.000758    -0.627 TRUE          FALSE         
-19 ALOF  FTEL  NC_089320.1_17230001_17240000     17230001          0.168 0.00224  -0.000607    -0.654 TRUE          FALSE         
-20 ALOF  FTEL  NC_089320.1_20690001_20700000     20690001          0.150 0.00191   0.000655     1.30  TRUE          FALSE         
-21 ALOF  FTEL  NC_089320.1_20700001_20710000     20700001          0.166 0.00230   0.000463     1.68  TRUE          FALSE         
-22 ALOF  FTEL  NC_089320.1_20710001_20720000     20710001          0.167 0.00204   0.000355     0.871 TRUE          FALSE         
-23 ALOF  FTEL  NC_089320.1_20810001_20820000     20810001          0.202 0.000701  0.000369     1.31  TRUE          FALSE         
-24 ALOF  FTEL  NC_089320.1_20860001_20870000     20860001          0.214 0.00139   0.00131      2.71  TRUE          FALSE         
-25 ALOF  FTEL  NC_089320.1_20880001_20890000     20880001          0.264 0.000983  0.00124      2.52  TRUE          TRUE          
-26 ALOF  FTEL  NC_089320.1_20890001_20900000     20890001          0.218 0.000689  0.000603     1.85  TRUE          FALSE         
-27 ALOF  FTEL  NC_089320.1_20930001_20940000     20930001          0.161 0.000329  0.000145     1.97  TRUE          FALSE         
-28 ALOF  FTEL  NC_089320.1_20940001_20950000     20940001          0.217 0.000424  0.000363     1.51  TRUE          FALSE         
-29 ALOF  FTEL  NC_089320.1_20950001_20960000     20950001          0.216 0.000702  0.000668     2.30  TRUE          FALSE         
-30 ALOF  FTEL  NC_089320.1_22910001_22920000     22910001          0.179 0.00268  -0.00235     -2.07  TRUE          FALSE  
+   pop1  pop2  window_id                     window_pos_1 avg_hudson_fst  avg_dxy   delta_pi delta_td tajima_d_FTEL tajima_d_ALOF candidate_q99 candidate_q999
+   <fct> <fct> <chr>                                <dbl>          <dbl>    <dbl>      <dbl>    <dbl>         <dbl>         <dbl> <lgl>         <lgl>         
+ 1 ALOF  FTEL  NC_089315.1_13520001_13530000     13520001          0.158 0.00160  -0.000170    0.967          0.917       -0.0502 TRUE          FALSE         
+ 2 ALOF  FTEL  NC_089315.1_15310001_15320000     15310001          0.248 0.00287  -0.000636    0.306         -0.404       -0.710  TRUE          TRUE          
+ 3 ALOF  FTEL  NC_089315.1_15330001_15340000     15330001          0.149 0.00135  -0.000636   -0.447         -0.361        0.0867 TRUE          FALSE         
+ 4 ALOF  FTEL  NC_089315.1_15340001_15350000     15340001          0.152 0.00478  -0.00103    -0.313         -0.528       -0.215  TRUE          FALSE         
+ 5 ALOF  FTEL  NC_089315.1_15500001_15510000     15500001          0.205 0.00111  -0.000613   -0.963         -0.565        0.398  TRUE          FALSE         
+ 6 ALOF  FTEL  NC_089315.1_15520001_15530000     15520001          0.190 0.000696 -0.000152    0.0530        -0.576       -0.628  TRUE          FALSE         
+ 7 ALOF  FTEL  NC_089315.1_28610001_28620000     28610001          0.164 0.000369 -0.0000332   0.456         -0.951       -1.41   TRUE          FALSE         
+ 8 ALOF  FTEL  NC_089315.1_28770001_28780000     28770001          0.256 0.00218  -0.000899   -0.969         -1.64        -0.671  TRUE          TRUE          
+ 9 ALOF  FTEL  NC_089315.1_28880001_28890000     28880001          0.158 0.00131  -0.0000394   0.345          0.520        0.175  TRUE          FALSE         
+10 ALOF  FTEL  NC_089315.1_28940001_28950000     28940001          0.165 0.00189  -0.000728   -0.169         -1.19        -1.02   TRUE          FALSE         
+11 ALOF  FTEL  NC_089315.1_29180001_29190000     29180001          0.181 0.00242  -0.000569    0.862         -0.511       -1.37   TRUE          FALSE         
+12 ALOF  FTEL  NC_089315.1_29190001_29200000     29190001          0.268 0.00346  -0.00171    -0.623         -1.11        -0.485  TRUE          TRUE          
+13 ALOF  FTEL  NC_089315.1_29200001_29210000     29200001          0.224 0.00269  -0.00168    -0.328         -1.49        -1.16   TRUE          FALSE         
+14 ALOF  FTEL  NC_089315.1_29230001_29240000     29230001          0.247 0.00247  -0.00101     0.214         -0.817       -1.03   TRUE          TRUE          
+15 ALOF  FTEL  NC_089315.1_29240001_29250000     29240001          0.210 0.00380  -0.00136    -0.0424        -0.733       -0.690  TRUE          FALSE         
+16 ALOF  FTEL  NC_089315.1_29320001_29330000     29320001          0.156 0.00160   0.000145    1.63           0.717       -0.908  TRUE          FALSE         
+17 ALOF  FTEL  NC_089315.1_30530001_30540000     30530001          0.261 0.00485  -0.000616   -0.164          0.146        0.311  TRUE          TRUE  
+```
+
+```r
+cand_windows_FTELALOF %>% filter(chromosome == "NC_089320.1" & candidate_q99 == TRUE) %>% select(pop1, pop2, window_id, window_pos_1, avg_hudson_fst, avg_dxy, delta_pi, delta_td, tajima_d_FTEL, tajima_d_ALOF, candidate_q99, candidate_q999)
+```
+```
+   pop1  pop2  window_id                     window_pos_1 avg_hudson_fst  avg_dxy   delta_pi delta_td tajima_d_FTEL tajima_d_ALOF candidate_q99 candidate_q999
+   <fct> <fct> <chr>                                <dbl>          <dbl>    <dbl>      <dbl>    <dbl>         <dbl>         <dbl> <lgl>         <lgl>         
+ 1 ALOF  FTEL  NC_089320.1_3720001_3730000        3720001          0.154 0.00384  -0.00177     -0.564      -0.955         -0.391  TRUE          FALSE         
+ 2 ALOF  FTEL  NC_089320.1_4530001_4540000        4530001          0.151 0.00147  -0.000364    -0.369       0.420          0.789  TRUE          FALSE         
+ 3 ALOF  FTEL  NC_089320.1_10200001_10210000     10200001          0.152 0.00279   0.00110      2.62        1.30          -1.32   TRUE          FALSE         
+ 4 ALOF  FTEL  NC_089320.1_10210001_10220000     10210001          0.229 0.00407   0.000602     0.953       0.907         -0.0463 TRUE          TRUE          
+ 5 ALOF  FTEL  NC_089320.1_10220001_10230000     10220001          0.164 0.00171   0.0000811    0.887       0.683         -0.204  TRUE          FALSE         
+ 6 ALOF  FTEL  NC_089320.1_10230001_10240000     10230001          0.198 0.00160   0.000234     1.44        0.389         -1.05   TRUE          FALSE         
+ 7 ALOF  FTEL  NC_089320.1_10240001_10250000     10240001          0.173 0.00361   0.000600     1.11       -0.144         -1.26   TRUE          FALSE         
+ 8 ALOF  FTEL  NC_089320.1_10330001_10340000     10330001          0.216 0.00424   0.000409     0.553       0.646          0.0933 TRUE          FALSE         
+ 9 ALOF  FTEL  NC_089320.1_10370001_10380000     10370001          0.198 0.000525  0.0000981    1.21        1.44           0.234  TRUE          FALSE         
+10 ALOF  FTEL  NC_089320.1_10380001_10390000     10380001          0.202 0.00122   0.000150     1.51       -0.242         -1.75   TRUE          FALSE         
+11 ALOF  FTEL  NC_089320.1_10390001_10400000     10390001          0.192 0.00144   0.000573     1.92        0.144         -1.78   TRUE          FALSE         
+12 ALOF  FTEL  NC_089320.1_10520001_10530000     10520001          0.172 0.00114   0.000342     1.32       -0.131         -1.45   TRUE          FALSE         
+13 ALOF  FTEL  NC_089320.1_10530001_10540000     10530001          0.171 0.00194   0.000775     2.06        0.626         -1.44   TRUE          FALSE         
+14 ALOF  FTEL  NC_089320.1_10550001_10560000     10550001          0.180 0.00184  -0.000170    -0.281       0.151          0.432  TRUE          FALSE         
+15 ALOF  FTEL  NC_089320.1_10570001_10580000     10570001          0.162 0.00331   0.00154      2.53        1.27          -1.26   TRUE          FALSE         
+16 ALOF  FTEL  NC_089320.1_10580001_10590000     10580001          0.168 0.00361   0.00173      1.66        0.277         -1.38   TRUE          FALSE         
+17 ALOF  FTEL  NC_089320.1_11370001_11380000     11370001          0.149 0.00251   0.000596     1.61        0.326         -1.28   TRUE          FALSE         
+18 ALOF  FTEL  NC_089320.1_13410001_13420000     13410001          0.153 0.00206  -0.000758    -0.627      -0.519          0.108  TRUE          FALSE         
+19 ALOF  FTEL  NC_089320.1_17230001_17240000     17230001          0.168 0.00224  -0.000607    -0.654       0.0196         0.673  TRUE          FALSE         
+20 ALOF  FTEL  NC_089320.1_20690001_20700000     20690001          0.150 0.00191   0.000655     1.30        0.00693       -1.29   TRUE          FALSE         
+21 ALOF  FTEL  NC_089320.1_20700001_20710000     20700001          0.166 0.00230   0.000463     1.68        1.07          -0.611  TRUE          FALSE         
+22 ALOF  FTEL  NC_089320.1_20710001_20720000     20710001          0.167 0.00204   0.000355     0.871      -0.637         -1.51   TRUE          FALSE         
+23 ALOF  FTEL  NC_089320.1_20810001_20820000     20810001          0.202 0.000701  0.000369     1.31       -0.475         -1.78   TRUE          FALSE         
+24 ALOF  FTEL  NC_089320.1_20860001_20870000     20860001          0.214 0.00139   0.00131      2.71        0.143         -2.57   TRUE          FALSE         
+25 ALOF  FTEL  NC_089320.1_20880001_20890000     20880001          0.264 0.000983  0.00124      2.52       -0.595         -3.11   TRUE          TRUE          
+26 ALOF  FTEL  NC_089320.1_20890001_20900000     20890001          0.218 0.000689  0.000603     1.85       -0.420         -2.27   TRUE          FALSE         
+27 ALOF  FTEL  NC_089320.1_20930001_20940000     20930001          0.161 0.000329  0.000145     1.97        0.115         -1.85   TRUE          FALSE         
+28 ALOF  FTEL  NC_089320.1_20940001_20950000     20940001          0.217 0.000424  0.000363     1.51       -1.21          -2.72   TRUE          FALSE         
+29 ALOF  FTEL  NC_089320.1_20950001_20960000     20950001          0.216 0.000702  0.000668     2.30       -0.490         -2.79   TRUE          FALSE         
+30 ALOF  FTEL  NC_089320.1_22910001_22920000     22910001          0.179 0.00268  -0.00235     -2.07       -1.51           0.562  TRUE          FALSE
 ```
 
 <br>
