@@ -6669,8 +6669,20 @@ Interestingly, the only annotations in the q999 window (NC_089320.1_20880001_208
 
 <br>
 
+#### FTEL candidate region NC_089315.1: 28770001-28780000
+- The only annotated feature overlapping this window is an uncharacterized lncRNA:
+
+| Accession   | Begin    | End      | Chromosome | Orientation | Name                         | Symbol       | Gene ID  | Gene Type | Transcripts accession | Protein accession |   |
+|-------------|----------|----------|------------|-------------|------------------------------|--------------|----------|-----------|-----------------------|-------------------|---|
+| NC_089315.1 | 28767931 | 28776690 | 4          | minus       | uncharacterized LOC136280424 | LOC136280424 | 136280424 | lncRNA    | XR_010717217.1        |                   |   |
+
+<br>
+
 #### FTEL candidate region NC_089315.1_29180001-29250000
-- There are 9 annotated features within this region, five on the plus strand and four on the minus strand:
+- There are 9 annotated features within this region, five on the plus strand and four on the minus strand
+- The q999 windows are:
+  - NC_089315.1_29190001_29200000
+  - NC_089315.1_29230001_29240000
 
 | Accession   | Begin    | End      | Chromosome | Orientation | Name                                             | Symbol       | Gene ID   | Gene Type      | Transcripts accession | Protein accession | Protein length |
 |-------------|----------|----------|------------|-------------|--------------------------------------------------|--------------|-----------|----------------|-----------------------|-------------------|----------------|
@@ -6684,11 +6696,32 @@ Interestingly, the only annotations in the q999 window (NC_089320.1_20880001_208
 | NC_089315.1 | 29241264 | 29242807 | 4          | plus        | uncharacterized LOC131779131                     | LOC131779131 | 131779131 | misc_RNA       | XR_010717221.1        |                   |                |
 | NC_089315.1 | 29246969 | 29249550 | 4          | plus        | forkhead box protein A2-like                     | LOC136276710 | 136276710 | protein-coding | XM_066165498.1        | XP_066021595.1    | 321            |
 
+This region is a little less clear in terms of the pattern of metrics. All 3 q999 windows have negative Tajima's D in both FTEL and ALOF. The first two have negative delta TD and the last positive delta TD. They all have negative delta pi, but FTEL also has slightly lower pi than ALOF across the whole genome. It could be that these regions are under selection in both populations?
+
+<br>
+
 The presence of multiple synaptotagmin genes is interesting. Synaptotagmin-4 (SYT4) is a calcium ion sensor and syntaxin-binding synaptic vesicle protein that helps regulate secretion in neurons. Synaptotagmin-7 (SYT7) is a high-affinity calcium sensor that mediates Ca²⁺-triggered membrane trafficking events. But synaptogens are broadly involved in calcium-regulated membrane trafficking and vesicle fusion, not just neural signaling. It's plausible that this signal could relate to how coral cells regulate symbiont-containing compartments (symbiosome) and exchange of molecules across membranes, but could also relate to other membrane trafficking functions.
 
 Interestingly, there are also a few developmental/regulatory genes in this region.
 
 <br>
+
+
+#### ALOF candidate region NC_089312.1_15300001-15310000
+- This window overlaps two protein-coding genes, one on each strand:
+
+| Accession   | Begin    | End      | Chromosome | Orientation | Name                                                       | Symbol       | Gene ID  | Gene Type      | Transcripts accession | Protein accession | Protein length |
+|-------------|----------|----------|------------|-------------|------------------------------------------------------------|--------------|----------|----------------|-----------------------|-------------------|----------------|
+| NC_089312.1 | 15298951 | 15307052 | 1          | minus       | isocitrate dehydrogenase [NAD] subunit beta, mitochondrial | LOC131781655 | 1.32E+08 | protein-coding | XM_059098365.2        | XP_058954348.2    | 379            |
+| NC_089312.1 | 15307134 | 15312612 | 1          | plus        | DNA mismatch repair protein Mlh1-like                      | LOC131781674 | 1.32E+08 | protein-coding | XM_059098394.2        | XP_058954377.2    | 745            |
+
+
+
+
+<br>
+<br>
+
+
 
 #### High FST candidate region NC_089319.1_7940001-7960000
 - There are 2 annotated features within this region, one on each strand:
@@ -6698,5 +6731,5 @@ Interestingly, there are also a few developmental/regulatory genes in this regio
 | NC_089319.1 | 7938951 | 7946627 | 8          | minus       | BRCA1-associated ATM activator 1 | LOC131793187 | 1.32E+08 | protein-coding | XM_059110592.2        | XP_058966575.2    | 940            |
 | NC_089319.1 | 7946900 | 7971815 | 8          | plus        | protein flightless-1 homolog     | LOC131793241 | 1.32E+08 | protein-coding | XM_066170535.1        | XP_066026632.1    | 1245           |
 
-The adjacent q999 windows on NC_089319.1 overlap BRAT1-like and FLII-like, with the second window falling entirely within FLII-like. This supports a real FTEL–ALOF differentiated haplotype involving genes associated with DNA-damage response and actin/cytoskeletal regulation. However, because FTEL has reduced π but positive Tajima’s D, the signal does not resemble a simple recent hard sweep.
+The adjacent q999 windows on NC_089319.1 overlap BRAT1-like and FLII-like, with the second window falling entirely within FLII-like. This supports an FTEL–ALOF differentiated haplotype involving genes associated with DNA-damage response and actin/cytoskeletal regulation. However, Tajima’s D is positive at these windows for both FTEL and ALOF so the signal does not resemble a simple recent hard sweep.
 
