@@ -4962,6 +4962,51 @@ ofu6_tajimad <- tajimad_location_filt %>%
     window_id = paste(chromosome, window_pos_1, window_pos_2, sep = "_")
   ) %>% 
   filter(pop == "OFU6")
+
+# calculate log pi ratios for OFU3/OFU6 comparison
+pi_OFU3_OFU6 <- pi_location_filt %>%
+  filter(pop %in% c("OFU3", "OFU6")) %>%
+  select(
+    chromosome,
+    window_pos_1,
+    window_pos_2,
+    pop,
+    avg_pi
+  ) %>%
+  pivot_wider(
+    names_from = pop,
+    values_from = avg_pi
+  ) %>%
+  mutate(
+    log2_pi_ratio = log2(OFU3 / OFU6)
+  )
+
+  # calculate median log pi ratio and quantile thresholds
+median_log2_pi_ratio_df <- pi_OFU3_OFU6 %>%
+  filter(
+    is.finite(log2_pi_ratio),
+    OFU3 > 0,
+    OFU6 > 0
+  ) %>%
+  summarise(
+    n_windows = n(),
+    median_log2_pi_ratio = median(log2_pi_ratio, na.rm = TRUE),
+    lower_log2_pi_ratio = quantile(log2_pi_ratio, probs = 0.05, na.rm = TRUE, names = FALSE),
+    upper_log2_pi_ratio = quantile(log2_pi_ratio, probs = 0.95, na.rm = TRUE, names = FALSE)
+  ) %>%
+  mutate(
+    lower_centered_log2_pi_ratio = lower_log2_pi_ratio - median_log2_pi_ratio,
+    upper_centered_log2_pi_ratio = upper_log2_pi_ratio - median_log2_pi_ratio
+  )
+
+median_log2_pi_ratio_OFU36 <- 
+  median_log2_pi_ratio_df$median_log2_pi_ratio
+
+lower_centered_pi_ratio_cutoff_OFU36 <-
+  median_log2_pi_ratio_df$lower_centered_log2_pi_ratio
+
+upper_centered_pi_ratio_cutoff_OFU36 <-
+  median_log2_pi_ratio_df$upper_centered_log2_pi_ratio
   ```
 
   <br>
@@ -4995,7 +5040,8 @@ q99_outlier_all_metrics <- ofu_fst_outliers_q99 %>%
                      no_sites_tajimad_OFU6 = no_sites),
             by = "window_id") %>% 
   mutate(delta_pi = avg_pi_OFU3 - avg_pi_OFU6) %>% 
-  mutate(delta_td = tajima_d_OFU3 - tajima_d_OFU6)
+  mutate(delta_td = tajima_d_OFU3 - tajima_d_OFU6) %>% 
+  mutate(log_pi_ratio_centered = log2(avg_pi_OFU3/avg_pi_OFU6 - median_log2_pi_ratio_OFU36))
   ```
 
   <br>
@@ -5033,7 +5079,8 @@ ofu36_all_metrics <- ofu_comp %>%
                      no_sites_tajimad_OFU6 = no_sites),
             by = "window_id") %>% 
   mutate(delta_pi = avg_pi_OFU3 - avg_pi_OFU6) %>% 
-  mutate(delta_td = tajima_d_OFU3 - tajima_d_OFU6)
+  mutate(delta_td = tajima_d_OFU3 - tajima_d_OFU6) %>% 
+  mutate(log_pi_ratio_centered = log2(avg_pi_OFU3/avg_pi_OFU6 - median_log2_pi_ratio_OFU36))
   ```
 
   <br>
@@ -5059,11 +5106,13 @@ p2_q99 <- ggplot() +
   geom_point(data = q99_outlier_all_metrics, aes(x = avg_pi_OFU6, y = avg_hudson_fst), color = "red") +
   theme_bw()
 
-# fst vs delta_pi
+# fst vs log pi ratio
 p3_q99 <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_point(data = ofu36_all_metrics, aes(x = delta_pi, y = avg_hudson_fst), alpha = 0.5) +
-  geom_point(data = q99_outlier_all_metrics, aes(x = delta_pi, y = avg_hudson_fst), color = "red") +
+  geom_vline(xintercept = lower_centered_pi_ratio_cutoff_OFU36, linetype = "dashed", linewidth = 0.25, color = "steelblue") +
+  geom_vline(xintercept = upper_centered_pi_ratio_cutoff_OFU36, linetype = "dashed", linewidth = 0.25, color = "steelblue") +
+  geom_point(data = ofu36_all_metrics, aes(x = log_pi_ratio_centered, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q99_outlier_all_metrics, aes(x = log_pi_ratio_centered, y = avg_hudson_fst), color = "red") +
   theme_bw()
 
 # fst vs OFU3 tajimad
@@ -5099,13 +5148,14 @@ p7_q99 <- ggplot() +
 ```r
 plot_grid(p0_q99, p1_q99, p2_q99, p3_q99, nrow = 2)
 ```
-![alt text](image-122.png)
+![alt text](image-147.png)
+
 
 Interpretation:
 - <u>Fst vs. no_snps</u> - highest Fst windows have lower SNP counts, but overall outliers are pretty evenly spread across SNP count range.
 - <u>Fst vs. pi_OFU3</u> - mixed bag; some outliers have reduced nucleotide diversity, but no general trend towards low pi that you would expect if there was a strong selective sweep driving Fst outliers. Outlier windows have mostly low-moderate pi, and none fall among the highest-pi windows.
 - <u>Fst vs. pi_OFU6</u> - similar to pi for OFU3; mixed bag.
-- <u>Fst vs. delta_pi</u> - outlier windows are both positive and negative, with maybe slightly more positive (OFU3 pi > OF6 pi), so elevated Fst is not being driven by reductions in diversity in one site or another. If high-FST windows were mainly being driven by OFU3-specific selective sweeps, we would expect most of them to have lower pi in OFU3 than OFU6 (delta_pi < 0).
+- <u>Fst vs. centered log2 pi ratio</u> - outlier windows are both positive and negative, with maybe slightly more positive, so elevated Fst is not being driven entirely by reductions in diversity in one site or another. If high-FST windows were mainly being driven by OFU3-specific selective sweeps, we would expect most of them to have lower pi in OFU3 than OFU6 (negative log2 ratio). Centering the log ratio (by subtracting the median) tells us whether OFU3 and OFU6 pi differ from each other more than usual. Negative centered ratios indicate OFU3 pi is more reduced than usual in that window. Positive centered ratios indicate OFU6 pi is more reduced than usual in that window. Lower 5% and upper 95% quantiles are indicated by the dashed blue lines. Among the four most divergent windows (highest Fst), three are negative and one is positive, and all fall within the extreme tails of centered log2 pi ratio.
 
 
 <br>
@@ -5153,7 +5203,22 @@ q999_outlier_all_metrics <- ofu_fst_outliers_q999 %>%
                      no_sites_tajimad_OFU6 = no_sites),
             by = "window_id") %>% 
   mutate(delta_pi = avg_pi_OFU3 - avg_pi_OFU6) %>% 
-  mutate(delta_td = tajima_d_OFU3 - tajima_d_OFU6)
+  mutate(delta_td = tajima_d_OFU3 - tajima_d_OFU6) %>% 
+  mutate(log_pi_ratio_centered = log2(avg_pi_OFU3/avg_pi_OFU6 - median_log2_pi_ratio_OFU36))  #add centered log2 pi ratio
+```
+
+<br>
+
+```r
+# calculate Tajima's D quantile cutoff
+tajimad_q10_OFU3 <- quantile(ofu36_all_metrics$tajima_d_OFU3, probs = 0.10, na.rm = TRUE, names = FALSE)
+tajimad_q10_OFU6 <- quantile(ofu36_all_metrics$tajima_d_OFU6, probs = 0.10, na.rm = TRUE, names = FALSE)
+```
+```
+> tajimad_q10_OFU3
+[1] -1.36579702652475
+> tajimad_q10_OFU6
+[1] -1.79881075404849
 ```
 
 <br>
@@ -5171,24 +5236,30 @@ p0_q999 <- ggplot() +
 p1_q999 <- ggplot() +
   geom_point(data = ofu36_all_metrics, aes(x = avg_pi_OFU3, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics, aes(x = avg_pi_OFU3, y = avg_hudson_fst), color = "red") +
+  geom_vline(xintercept = 0.00188, color = "black", linetype = "dashed") +   # add line for population median pi
   theme_bw()
 
 # fst vs OFU6 pi
 p2_q999 <- ggplot() +
   geom_point(data = ofu36_all_metrics, aes(x = avg_pi_OFU6, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics, aes(x = avg_pi_OFU6, y = avg_hudson_fst), color = "red") +
+  geom_vline(xintercept = 0.00194, color = "black", linetype = "dashed") +   # add line for population median pi
   theme_bw()
 
-# fst vs delta_pi
+# fst vs centered log pi ratio
 p3_q999 <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_point(data = ofu36_all_metrics, aes(x = delta_pi, y = avg_hudson_fst), alpha = 0.5) +
-  geom_point(data = q999_outlier_all_metrics, aes(x = delta_pi, y = avg_hudson_fst), color = "red") +
+  geom_vline(xintercept = lower_centered_pi_ratio_cutoff_OFU36, linetype = "dashed", color = "steelblue", linewidth = 0.25) +
+  geom_vline(xintercept = upper_centered_pi_ratio_cutoff_OFU36, linetype = "dashed", color = "steelblue", linewidth = 0.25) +
+  geom_point(data = ofu36_all_metrics, aes(x = log_pi_ratio_centered, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q999_outlier_all_metrics, aes(x = log_pi_ratio_centered, y = avg_hudson_fst), color = "red") +
   theme_bw()
 
 # fst vs OFU3 tajimad
 p4_q999 <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = median(ofu36_all_metrics$tajima_d_OFU3, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_vline(xintercept = tajimad_q10_OFU3, linetype = "dashed", color = "steelblue", linewidth = 0.25) +
   geom_point(data = ofu36_all_metrics, aes(x = tajima_d_OFU3, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics, aes(x = tajima_d_OFU3, y = avg_hudson_fst), color = "red") +
   theme_bw()
@@ -5196,6 +5267,8 @@ p4_q999 <- ggplot() +
 # fst vs OFU6 tajimad
 p5_q999 <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = median(ofu36_all_metrics$tajima_d_OFU6, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_vline(xintercept = tajimad_q10_OFU6, linetype = "dashed", color = "steelblue", linewidth = 0.25) +
   geom_point(data = ofu36_all_metrics, aes(x = tajima_d_OFU6, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics, aes(x = tajima_d_OFU6, y = avg_hudson_fst), color = "red") +
   theme_bw()
@@ -5203,12 +5276,14 @@ p5_q999 <- ggplot() +
 # fst vs delta_tajimad
 p6_q999 <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = median(ofu36_all_metrics$delta_td, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_point(data = ofu36_all_metrics, aes(x = delta_td, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics, aes(x = delta_td, y = avg_hudson_fst), color = "red") +
   theme_bw()
 
 # fst vs dxy
 p7_q999 <- ggplot() +
+  geom_vline(xintercept = median(ofu36_all_metrics$avg_dxy, na.rm = TRUE), linetype = "dashed") +
   geom_point(data = ofu36_all_metrics, aes(x = avg_dxy, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics, aes(x = avg_dxy, y = avg_hudson_fst), color = "red") +
   theme_bw()
@@ -5217,28 +5292,29 @@ p7_q999 <- ggplot() +
 <br>
 
 ```r
-plot_grid(p0_q999, p1_q999, p2_q999, p3_q999, nrow = 2)
+plot_grid(p1_q999, p0_q999, p2_q999, p3_q999, nrow = 2)
 ```
-![alt text](image-120.png)
+![alt text](image-150.png)
+
 Interpretation:
 - <u>Fst vs. no_snps</u> - The q999 set is enriched for lower-SNP windows relative to q99, so the most extreme tail may be more sensitive to stochasticity; however, not all q999 windows are low-SNP.
 - <u>Fst vs. pi_OFU3</u> - Similar trend as with SNP number - remaining outlier windows at q999 are predominantly lower pi windows (<0.002). Only 4 outlier windows have moderate pi (>0.002). This greater skew toward low pi is consistent with signatures of selection in these windows, but could also be a result of other factors like low SNP count.
 - <u>Fst vs. pi_OFU6</u> - similar to pi for OFU3, but less skewed toward low pi.
-- <u>Fst vs. delta_pi</u> - outlier windows are still both positive and negative, and pretty evenly split. It is interesting to note, however, that 3 of the 4 greatest outlier windows have lower pi in OFU3 than OFU6. If these high-FST windows were being driven by OFU3-specific selective sweeps, this is what we would expect (delta_pi < 0).
+- <u>Fst vs. delta_pi</u> - outlier windows are still both positive and negative, and pretty evenly split. It is interesting to note, however, that 3 of the 4 greatest outlier windows have exceptionally low pi in OFU3 compared to OFU6. If these high-FST windows were being driven by OFU3-specific selective sweeps, this is what we would expect (log2 pi ratio < median).
 
 <br>
 
 ```r
-plot_grid(p7_q999, p4_q999, p5_q999, p6_q999, nrow = 2)
+plot_grid(p4_q999, p7_q999, p5_q999, p6_q999, nrow = 2)
 ```
-![alt text](image-121.png)
+![alt text](image-151.png)
 Interpretation:
 - <u>Fst vs. dxy</u> - Not much change from q99 outlier set. The highest Fst windows are still fairly evenly spread at low to moderate Dxy, not concentrated at the extreme highest Dxy values.
-- <u>Fst vs. tajima_d_OFU3</u> - Outliers pretty evenly split between positive and negative Tajima's D. But interesting to note that 3 of the 4 highest Fst windows have fairly negative Tajima's D (-1 to -2). Again, if elevated Fst in these 3 windows were being driven by a selective sweep/directional selection in OFU3, this is what we'd expect.
-- <u>Fst vs. tajima_d_OFU6</u> - full dataset and outliers both still skewed more negative compared to the OFU3 distribution. The 3 Fst outlier windows mentioned above with fairly negative D in OFU3 are fairly close to 0 in OFU6 (-1 to +1).
-- <u>Fst vs. delta_td</u> - Fst outlier windows are no longer skewed positive. 7 are negative and 10 positive. The 3 outlier windows mentioned above are all fairly negative (delta_D < -1), again consistent with OFU3-driven selection.
+- <u>Fst vs. tajima_d_OFU3</u> - Outliers pretty evenly split between positive and negative Tajima's D. But interesting to note that 3 of the 4 highest Fst windows have fairly negative Tajima's D (close to or past the q10 quantile, shown as dashed blue line). Again, if elevated Fst in these 3 windows were being driven by a selective sweep/directional selection in OFU3, this is what we'd expect.
+- <u>Fst vs. tajima_d_OFU6</u> - full dataset and outliers both still skewed more negative compared to the OFU3 distribution. The 3 Fst outlier windows mentioned above with fairly negative D in OFU3 are fairly close to 0 in OFU6 (-1 to +1). The hightest Fst window has Tajima's D more negative than the median (thinner dashed black line).
+- <u>Fst vs. delta_td</u> - Fst outlier windows are no longer skewed positive. 7 are negative and 10 positive. Median value is positive. The 3 outlier windows mentioned above are all fairly negative (delta_D < -1), again consistent with OFU3-driven selection.
 
-**Synthesis**: The q999 outlier set remains heterogeneous overall and does not show elevated Dxy, so it does not support a genome-wide pattern of deep divergence or a uniform OFU3-selection signature. However, **3 of the top 4 FST windows stand out as stronger OFU3-specific candidate regions** because they combine very high FST with lower OFU3 π, more negative OFU3 Tajima’s D, and non-elevated Dxy.
+**Synthesis**: The q999 outlier set remains heterogeneous overall and does not show elevated Dxy, so it does not support a genome-wide pattern of deep divergence or a uniform OFU3-selection signature. However, **3 of the top 4 FST windows stand out as stronger OFU3-specific candidate regions** because they combine very high FST with lower OFU3 π, especially negative centered log2 pi ratio, and especially negative OFU3 Tajima’s D.
 
 <br>
 
@@ -5295,8 +5371,13 @@ Let's plot that chromosome again on it's own, with the candidate region highligh
 # create new column that indicates the 4 candidate windows
 cand_windows <- ofu36_all_metrics %>% 
   mutate(
-    candidate = chromosome == "NC_089312.1" &
-      window_pos_1 %in% c(34680001, 34690001, 34700001, 34710001)
+    candidate = 
+      chromosome == "NC_089312.1" & 
+      window_pos_1 %in% (
+      ofu_fst_outliers_q999 %>%
+        filter(chromosome == "NC_089312.1") %>%
+        pull(window_pos_1)
+      )
   ) %>% 
   filter(chromosome == "NC_089312.1")
 
@@ -5304,7 +5385,7 @@ cand_windows <- ofu36_all_metrics %>%
 cand_reg_fst <- ggplot(cand_windows, aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
   geom_point(data = cand_windows %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
-  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
   labs(
     x = "Genomic position (Mbp)",
@@ -5313,15 +5394,17 @@ cand_reg_fst <- ggplot(cand_windows, aes(x = window_pos_1/1e6, y = avg_hudson_fs
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# plot delta_pi
-cand_reg_deltapi <- ggplot(cand_windows, aes(x = window_pos_1/1e6, y = delta_pi)) +
+# plot log pi ratio
+cand_reg_logpiratio <- ggplot(cand_windows, aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = lower_centered_pi_ratio_cutoff_OFU36, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = upper_centered_pi_ratio_cutoff_OFU36, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
   labs(
     x = "Genomic position (Mbp)",
-    y = "Δπ"
+    y = "centered log2(π ratio)"
   ) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -5329,6 +5412,7 @@ cand_reg_deltapi <- ggplot(cand_windows, aes(x = window_pos_1/1e6, y = delta_pi)
 # plot delta_td
 cand_reg_deltatd <- ggplot(cand_windows, aes(x = window_pos_1/1e6, y = delta_td)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$delta_td, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
@@ -5339,17 +5423,63 @@ cand_reg_deltatd <- ggplot(cand_windows, aes(x = window_pos_1/1e6, y = delta_td)
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+# plot tajima's D for OFU3
+cand_reg_tdOFU3 <- ggplot(cand_windows, aes(x = window_pos_1/1e6, y = tajima_d_OFU3)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$tajima_d_OFU3, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_OFU3, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "OFU3 Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot tajima's D for OFU6
+cand_reg_tdOFU6 <- ggplot(cand_windows, aes(x = window_pos_1/1e6, y = tajima_d_OFU6)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$tajima_d_OFU6, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_OFU6, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "OFU6 Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot dxy
+cand_reg_dxy <- ggplot(cand_windows, aes(x = window_pos_1/1e6, y = avg_dxy)) +
+  geom_hline(yintercept = median(ofu36_all_metrics$avg_dxy, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Dxy"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 # combine plots
 plot_grid(cand_reg_fst + labs(x = NULL),
-          cand_reg_deltapi + labs(x = NULL),
-          cand_reg_deltatd,
+          cand_reg_logpiratio + ylim(-2,2) + labs(x = NULL), # reduced upper axis limit to make candidate regions easier to see/distinguish from each other
+          cand_reg_deltatd + labs(x = NULL),
+          cand_reg_tdOFU3 + labs(x = NULL),
+          cand_reg_tdOFU6 + labs(x = NULL),
+          cand_reg_dxy,
           ncol = 1,
           align = "v",
           axis = "lr"
           )
 ```
-![alt text](image-124.png)
+![alt text](image-152.png)
 
 <br>
 <br>
