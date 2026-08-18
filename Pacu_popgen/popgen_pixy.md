@@ -5546,7 +5546,7 @@ c15_cand_fst <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = avg_hudso
   geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
   geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
-  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
   labs(
     x = "Genomic position (Mbp)",
@@ -5555,16 +5555,18 @@ c15_cand_fst <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = avg_hudso
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# plot delta_pi
-c15_cand_deltapi <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = delta_pi)) +
+# plot centered log pi ratio
+c15_cand_logpiratio <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = lower_centered_pi_ratio_cutoff_OFU36, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = upper_centered_pi_ratio_cutoff_OFU36, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
   geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
   facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
   labs(
     x = "Genomic position (Mbp)",
-    y = "Δπ"
+    y = "centered log2(π ratio)"
   ) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -5572,6 +5574,7 @@ c15_cand_deltapi <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = delta
 # plot delta_td
 c15_cand_deltatd <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = delta_td)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$delta_td, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
   geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
@@ -5583,8 +5586,41 @@ c15_cand_deltatd <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = delta
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+# plot tajima's D for OFU3
+c15_cand_tdOFU3 <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = tajima_d_OFU3)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$tajima_d_OFU3, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_OFU3, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "OFU3 Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot tajima's D for OFU6
+c15_cand_tdOFU6 <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = tajima_d_OFU6)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$tajima_d_OFU6, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_OFU6, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "OFU6 Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 # plot dxy
 c15_cand_dxy <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = avg_dxy)) +
+  geom_hline(yintercept = median(ofu36_all_metrics$avg_dxy, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
   geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
@@ -5599,15 +5635,17 @@ c15_cand_dxy <- ggplot(cand_windows_c15, aes(x = window_pos_1/1e6, y = avg_dxy))
 
 # combine plots
 plot_grid(c15_cand_fst + labs(x = NULL),
-          c15_cand_deltapi + labs(x = NULL),
+          c15_cand_logpiratio + labs(x = NULL),
           c15_cand_deltatd + labs(x = NULL),
+          c15_cand_tdOFU3 + labs(x = NULL),
+          c15_cand_tdOFU6 + labs(x = NULL),
           c15_cand_dxy,
           ncol = 1,
           align = "v",
           axis = "lr"
 )
 ```
-![alt text](image-129.png)
+![alt text](image-153.png)
 
 <br>
 
