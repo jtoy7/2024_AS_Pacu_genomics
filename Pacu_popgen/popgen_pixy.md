@@ -5706,15 +5706,17 @@ c13_cand_fst <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = avg_hudso
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# plot delta_pi
-c13_cand_deltapi <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = delta_pi)) +
+# plot log2 pi ratio
+c13_cand_logpiratio <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = lower_centered_pi_ratio_cutoff_OFU36, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = upper_centered_pi_ratio_cutoff_OFU36, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
   labs(
     x = "Genomic position (Mbp)",
-    y = "Δπ"
+    y = "centered log2(π ratio)"
   ) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -5722,6 +5724,7 @@ c13_cand_deltapi <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = delta
 # plot delta_td
 c13_cand_deltatd <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = delta_td)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$delta_td, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
@@ -5732,9 +5735,26 @@ c13_cand_deltatd <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = delta
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+# plot tajima's D for OFU3
+c13_cand_tdOFU3 <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = tajima_d_OFU3)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$tajima_d_OFU3, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_OFU3, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "OFU3 Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 # plot tajima's D for OFU6
 c13_cand_tdOFU6 <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = tajima_d_OFU6)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$tajima_d_OFU6, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_OFU6, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
@@ -5747,6 +5767,7 @@ c13_cand_tdOFU6 <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = tajima
 
 # plot dxy
 c13_cand_dxy <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = avg_dxy)) +
+  geom_hline(yintercept = median(ofu36_all_metrics$avg_dxy, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
@@ -5760,8 +5781,9 @@ c13_cand_dxy <- ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = avg_dxy))
 
 # combine plots
 plot_grid(c13_cand_fst + labs(x = NULL),
-          c13_cand_deltapi + labs(x = NULL),
+          c13_cand_logpiratio + labs(x = NULL),
           c13_cand_deltatd + labs(x = NULL),
+          c13_cand_tdOFU3 + labs(x = NULL),
           c13_cand_tdOFU6 + labs(x = NULL),
           c13_cand_dxy,
           ncol = 1,
@@ -5769,16 +5791,14 @@ plot_grid(c13_cand_fst + labs(x = NULL),
           axis = "lr"
 )
 ```
-![alt text](image-130.png)
+![alt text](image-154.png)
 
 
 ```r
 # plot fst vs. dxy
-ggplot(cand_windows_c15, aes(x = avg_dxy, y = avg_hudson_fst)) +
-  geom_point(data = cand_windows_c15 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_c15 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
-  geom_point(data = cand_windows_c15 %>% filter(window_pos_1 %in% c(21240001, 21250001)), color = "orange", alpha = 1, size = 1.5) + # add in contiguous "nearly q999" windows
-  geom_text_repel(data = cand_windows_c15 %>% filter(candidate | window_pos_1 %in% c(21240001, 21250001)), aes(label = window_pos_1), color = "red", alpha = 1, size = 3) +
+ggplot(cand_windows_c13, aes(x = avg_dxy, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
   labs(
     x = "Average Dxy",
@@ -5787,9 +5807,318 @@ ggplot(cand_windows_c15, aes(x = avg_dxy, y = avg_hudson_fst)) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
   ```
-![alt text](image-131.png)
+  ![alt text](image-155.png)
+
 
 <br>
+<br>
+
+
+Now let's look at the single q999 candidate window on chromosome NC_089318:
+```r
+ofu_fst_outliers_q999 %>% 
+  select(comparison, chromosome, window_pos_1, window_pos_2, window_id, avg_hudson_fst, no_snps) %>% 
+  filter(chromosome == "NC_089318.1")
+```
+```
+  comparison chromosome  window_pos_1 window_pos_2 window_id                     avg_hudson_fst no_snps
+  <fct>      <fct>              <dbl>        <dbl> <chr>                                  <dbl>   <dbl>
+1 OFU3_OFU6  NC_089318.1     24190001     24200000 NC_089318.1_24190001_24200000          0.271     100
+```
+
+<br>
+
+```r
+# create new column that indicates the candidate window
+cand_windows_c18 <- ofu36_all_metrics %>% 
+  mutate(
+    candidate = chromosome == "NC_089318.1" &
+      window_pos_1 == "24190001"
+  ) %>% 
+  filter(chromosome == "NC_089318.1")
+```
+
+<br>
+
+```r
+# plot fst
+c18_cand_fst <- ggplot(cand_windows_c18, aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c18 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c18 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot log2 pi ratio
+c18_cand_logpiratio <- ggplot(cand_windows_c18, aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = lower_centered_pi_ratio_cutoff_OFU36, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = upper_centered_pi_ratio_cutoff_OFU36, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c18 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c18 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "centered log2(π ratio)"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot delta_td
+c18_cand_deltatd <- ggplot(cand_windows_c18, aes(x = window_pos_1/1e6, y = delta_td)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$delta_td, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c18 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c18 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Δ Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot tajima's D for OFU3
+c18_cand_tdOFU3 <- ggplot(cand_windows_c18, aes(x = window_pos_1/1e6, y = tajima_d_OFU3)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$tajima_d_OFU3, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_OFU3, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c18 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c18 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "OFU3 Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot tajima's D for OFU6
+c18_cand_tdOFU6 <- ggplot(cand_windows_c18, aes(x = window_pos_1/1e6, y = tajima_d_OFU6)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$tajima_d_OFU6, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_OFU6, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c18 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c18 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "OFU6 Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot dxy
+c18_cand_dxy <- ggplot(cand_windows_c18, aes(x = window_pos_1/1e6, y = avg_dxy)) +
+  geom_hline(yintercept = median(ofu36_all_metrics$avg_dxy, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c18 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c18 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Dxy"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+# combine plots
+plot_grid(c18_cand_fst + labs(x = NULL),
+          c18_cand_logpiratio + labs(x = NULL),
+          c18_cand_deltatd + labs(x = NULL),
+          c18_cand_tdOFU3 + labs(x = NULL),
+          c18_cand_tdOFU6 + labs(x = NULL),
+          c18_cand_dxy,
+          ncol = 1,
+          align = "v",
+          axis = "lr"
+)
+```
+![alt text](image-156.png)
+
+<br>
+
+NC_089318.1_24190001 is a solid OFU3 positive selection candidate:
+- The single outlier window has negative log2 pi ratio (below q5 quantile), negative OFU3 Tajima's D (near q10 quantile), very neagtive delta_td (second lowest on chromosome), and moderate Dxy (above median).
+
+<br>
+
+```r
+# plot fst vs. dxy
+ggplot(cand_windows_c18, aes(x = avg_dxy, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c18 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c18 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Average Dxy",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  ```
+  ![alt text](image-157.png)
+
+  <br>
+  <br>
+
+
+Now let's look at the single q999 candidate window on chromosome NC_089324:
+```r
+ofu_fst_outliers_q999 %>% 
+  select(comparison, chromosome, window_pos_1, window_pos_2, window_id, avg_hudson_fst, no_snps) %>% 
+  filter(chromosome == "NC_089324.1")
+```
+```
+  comparison chromosome  window_pos_1 window_pos_2 window_id                     avg_hudson_fst no_snps
+  <fct>      <fct>              <dbl>        <dbl> <chr>                                  <dbl>   <dbl>
+1 OFU3_OFU6  NC_089324.1     12810001     12820000 NC_089324.1_12810001_12820000          0.288      46
+```
+
+<br>
+
+```r
+# create new column that indicates the candidate window
+cand_windows_c24 <- ofu36_all_metrics %>% 
+  mutate(
+    candidate = chromosome == "NC_089324.1" &
+      window_pos_1 == "12810001"
+  ) %>% 
+  filter(chromosome == "NC_089324.1")
+```
+
+<br>
+
+```r
+# plot fst
+c24_cand_fst <- ggplot(cand_windows_c24, aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c24 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c24 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot log2 pi ratio
+c24_cand_logpiratio <- ggplot(cand_windows_c24, aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = lower_centered_pi_ratio_cutoff_OFU36, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = upper_centered_pi_ratio_cutoff_OFU36, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c24 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c24 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "centered log2(π ratio)"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot delta_td
+c24_cand_deltatd <- ggplot(cand_windows_c24, aes(x = window_pos_1/1e6, y = delta_td)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$delta_td, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c24 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c24 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Δ Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot tajima's D for OFU3
+c24_cand_tdOFU3 <- ggplot(cand_windows_c24, aes(x = window_pos_1/1e6, y = tajima_d_OFU3)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$tajima_d_OFU3, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_OFU3, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c24 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c24 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "OFU3 Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot tajima's D for OFU6
+c24_cand_tdOFU6 <- ggplot(cand_windows_c24, aes(x = window_pos_1/1e6, y = tajima_d_OFU6)) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(ofu36_all_metrics$tajima_d_OFU6, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_OFU6, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c24 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c24 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "OFU6 Tajima's D"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# plot dxy
+c24_cand_dxy <- ggplot(cand_windows_c24, aes(x = window_pos_1/1e6, y = avg_dxy)) +
+  geom_hline(yintercept = median(ofu36_all_metrics$avg_dxy, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_point(data = cand_windows_c24 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c24 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Dxy"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+# combine plots
+plot_grid(c24_cand_fst + labs(x = NULL),
+          c24_cand_logpiratio + labs(x = NULL),
+          c24_cand_deltatd + labs(x = NULL),
+          c24_cand_tdOFU3 + labs(x = NULL),
+          c24_cand_tdOFU6 + labs(x = NULL),
+          c24_cand_dxy,
+          ncol = 1,
+          align = "v",
+          axis = "lr"
+)
+```
+![alt text](image-158.png)
+
+<br>
+
+NC_089324.1_12810001 is a solid OFU6 positive selection candidate:
+- The single outlier window has positive log2 pi ratio (well above q95 quantile), negative OFU6 Tajima's D (less than median), very positive delta_td (highest on chromosome), and moderate Dxy (below median).
+
+<br>
+
+```r
+# plot fst vs. dxy
+ggplot(cand_windows_c24, aes(x = avg_dxy, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c24 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c24 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Average Dxy",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+![alt text](image-159.png)
+
+<br>
+<br>
+
 
 Rough summary of OFU3 and OFU6:
 
