@@ -6345,7 +6345,8 @@ DDX60 is involved in antiviral immunity and RNA helicase-dependent signaling (Ge
 
 #### OFU6 candidate region NC_089313.1_17880001_17890000:
 There is only one other window on this chromosome that passes the q999 threshold, so might as well take a look at it.
--There are three annotated features overlapping this window, 2 protein-coding genes and one pseudogene:
+
+- There are three annotated features overlapping this window, 2 protein-coding genes and one pseudogene:
 
 | Accession   | Begin    | End      | Chromosome | Orientation | Name                         | Symbol       | Gene ID  | Gene Type      | Transcripts accession | Protein accession | Protein length |
 |-------------|----------|----------|------------|-------------|------------------------------|--------------|----------|----------------|-----------------------|-------------------|----------------|
@@ -6357,6 +6358,29 @@ Beta-1,3-glucosyltransferase (B3glct) is involved in modification of thrombospon
 
 (ROGDI) is a component of the Rabconnectin-3 complex involved in the assembly and activation of vacuolar-type H⁺-ATPases (V-ATPases), which are proton pumps that acidify lysosomes, endosomes, Golgi-derived compartments, and other intracellular vesicles (<a href="https://www.jbc.org/article/S0021-9258(25)00230-3/fulltext">Winkley & Kane 2025</a>). The overlap of this gene with the candidate window suggests potential effects on lysosomal degradation (protein turnover) and intracellular pH regulation. Interestingly, V-type H⁺-ATPase also acidifies the host-derived symbiosome surrounding Symbiodiniaceae. That acidification concentrates CO₂ and promotes algal photosynthesis (<a href="https://www.pnas.org/doi/10.1073/pnas.1413483112?url_ver=Z39.88-2003&rfr_id=ori:rid:crossref.org&rfr_dat=cr_pub%20%200pubmed">Barott et al. 2015</a>).
 
+<br>
+
+#### OFU3 candidate region NC_089318.1:24190001-24200000:
+There is only one q999 candidate window on this chromosome. It overlaps a single protein coding gene:
+
+| Accession   | Begin    | End      | Chromosome | Orientation | Name         | Symbol       | Gene ID  | Gene Type      | Transcripts accession | Protein accession | Protein length |
+|-------------|----------|----------|------------|-------------|--------------|--------------|----------|----------------|-----------------------|-------------------|----------------|
+| NC_089318.1 | 24183872 | 24204983 | 7          | plus        | usherin-like | LOC131792043 | 1.32E+08 | protein-coding | XM_059109402.2        | XP_058965385.2    | 2504           |
+
+Usherin (encoded by ush2a in vertebrates) is a basement membrane protein that interacts with fibronectin and may contribute to extracellular matrix organization and stabilization (<a href = "https://pubs.acs.org/bichaw/article-abstract/44/34/11518/3697959/Evidence-for-Functional-Importance-of-Usherin?redirectedFrom=fulltext">Bhattacharya & Cosgrove 2005</a>).
+
+
+#### OFU6 candidate region NC_089324.1_12810001_12820000:
+There is only one q999 candidate window on this chromosome. It overlaps a single uncharacterized protein coding gene:
+
+| Accession   | Begin    | End      | Chromosome | Orientation | Name                         | Symbol       | Gene ID  | Gene Type      | Transcripts accession | Protein accession | Protein length |
+|-------------|----------|----------|------------|-------------|------------------------------|--------------|----------|----------------|-----------------------|-------------------|----------------|
+| NC_089324.1 | 12811594 | 12816918 | 13         | minus       | uncharacterized LOC131775097 | LOC131775097 | 1.32E+08 | protein-coding | XM_059091188.2        | XP_058947171.2    | 556            |
+
+A blast of the protein sequence against the nr database indicates homology with Lactadherin [Stylophora pistillata]
+(Sequence ID: PFX18453.1; E-value: 0.0, Query Cover: 95%, Identities: 403/499(81%), Positives: 446/499(89%), Gaps:1/499(0%)).
+
+Lactadherin (encoded by Mfge8 in vertebrates) is a bridging glycoprotein that is known to facilitate phagocytosis of apoptotic cells by binding exposed aminophospholipids like phosphatidylserine on apoptotic cells and αvβ3 integrins on phagocytes (<a href = "https://www.nature.com/articles/417182a">Hanayama et al. 2002</a>).
 
 <br>
 <br>
