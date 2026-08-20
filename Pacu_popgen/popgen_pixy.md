@@ -6388,14 +6388,17 @@ Lactadherin (encoded by Mfge8 in vertebrates) is a bridging glycoprotein that is
 #### Now let's zoom in on the FTEL vs. ALOF comparison specifically (lowest and highest ED50 locations, respectively)
 ```r
 FTEL_ALOF_comp <- fst_location_filt_snpfilt %>% 
-  filter(comparison %in% c("FTEL_ALOF", "ALOF_FTEL"))
+  filter(comparison %in% c("FTEL_ALOF", "ALOF_FTEL")) %>% 
+  mutate(
+    window_id = paste(chromosome, window_pos_1, window_pos_2, sep = "_")
+  )
 
 
 # plot Fst per window across the genome for the FTEL/ALOF comparison
 ggplot(FTEL_ALOF_comp, aes(x = window_pos_1, y = avg_hudson_fst)) +
   geom_point(alpha = 0.3, size = 0.5) +
   geom_smooth(span = 0.1, color = "red", linewidth = 0.5) +
-  facet_wrap(~ chromosome, scales = "free_x") +
+  facet_wrap(~ chromosome, scales = "free_x", nrow=2) +
   labs(
     x = "Genomic position",
     y = "Average Hudson Fst"
@@ -6494,8 +6497,8 @@ levels(FTELALOF_fst_outliers_q999$chromosome %>% droplevels())
 
 ```r
 # plot these cutoffs on the genome-wide Fst plot
-q99 <- quantile(FTEL_ALOF_comp$avg_hudson_fst, 0.99, na.rm = TRUE)
-q999 <- quantile(FTEL_ALOF_comp$avg_hudson_fst, 0.999, na.rm = TRUE)
+q99_FTELALOF <- quantile(FTEL_ALOF_comp$avg_hudson_fst, 0.99, na.rm = TRUE)
+q999_FTELALOF <- quantile(FTEL_ALOF_comp$avg_hudson_fst, 0.999, na.rm = TRUE)
 ```
 ```
 > q99
@@ -6514,8 +6517,8 @@ Fst 99th and 99.9th percentile cutoffs are 0.148 and 0.228, respectively.
 ggplot(FTEL_ALOF_comp, aes(x = window_pos_1, y = avg_hudson_fst)) +
   geom_point(alpha = 0.3, size = 0.5) +
   geom_smooth(span = 0.1, color = "red", linewidth = 0.5) +
-  geom_hline(yintercept = q99, color = "darkblue", linetype = "dashed", linewidth = 0.5) +
-  geom_hline(yintercept = q999, color = "lightblue", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = q99_FTELALOF, color = "darkblue", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = q999_FTELALOF, color = "lightblue", linetype = "dashed", linewidth = 0.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
   labs(
     x = "Genomic position",
@@ -6533,8 +6536,8 @@ ggplot(FTEL_ALOF_comp, aes(x = window_pos_1, y = avg_hudson_fst)) +
 ggplot(FTEL_ALOF_comp, aes(x = no_snps, y = avg_hudson_fst)) +
   geom_point(alpha = 0.3, size = 0.6) +
   geom_smooth(method = "lm", se = TRUE) +
-  geom_hline(yintercept = q99, color = "darkblue", linetype = "dashed", linewidth = 0.5) +
-  geom_hline(yintercept = q999, color = "lightblue", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = q99_FTELALOF, color = "darkblue", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = q999_FTELALOF, color = "lightblue", linetype = "dashed", linewidth = 0.5) +
   geom_vline(xintercept = 10, color = "darkgreen", linetype = "dashed") +
   labs(
     x = "Number of SNPs per window",
@@ -6582,7 +6585,65 @@ ALOF_tajimad <- tajimad_location_filt %>%
   ) %>% 
   filter(pop == "ALOF")
 
+# calculate log pi ratios for OFU3/OFU6 comparison
+pi_FTEL_ALOF <- pi_location_filt %>%
+  filter(pop %in% c("FTEL", "ALOF")) %>%
+  select(
+    chromosome,
+    window_pos_1,
+    window_pos_2,
+    pop,
+    avg_pi
+  ) %>%
+  pivot_wider(
+    names_from = pop,
+    values_from = avg_pi
+  ) %>%
+  mutate(
+    log2_pi_ratio = log2(FTEL / ALOF)
+  )
+```
 
+```r
+# calculate median log pi ratio and quantile thresholds
+median_log2_pi_ratio_df_FTELALOF <- pi_FTEL_ALOF %>%
+  filter(
+    is.finite(log2_pi_ratio),
+    FTEL > 0,
+    ALOF > 0
+  ) %>%
+  summarise(
+    n_windows = n(),
+    median_log2_pi_ratio = median(log2_pi_ratio, na.rm = TRUE),
+    lower_log2_pi_ratio = quantile(log2_pi_ratio, probs = 0.05, na.rm = TRUE, names = FALSE),
+    upper_log2_pi_ratio = quantile(log2_pi_ratio, probs = 0.95, na.rm = TRUE, names = FALSE)
+  ) %>%
+  mutate(
+    lower_centered_log2_pi_ratio = lower_log2_pi_ratio - median_log2_pi_ratio,
+    upper_centered_log2_pi_ratio = upper_log2_pi_ratio - median_log2_pi_ratio
+  )
+
+median_log2_pi_ratio_FTELALOF <- 
+  median_log2_pi_ratio_df_FTELALOF$median_log2_pi_ratio
+
+lower_centered_pi_ratio_cutoff_FTELALOF <-
+  median_log2_pi_ratio_df_FTELALOF$lower_centered_log2_pi_ratio
+
+upper_centered_pi_ratio_cutoff_FTELALOF <-
+  median_log2_pi_ratio_df_FTELALOF$upper_centered_log2_pi_ratio
+```
+```
+> median_log2_pi_ratio_FTELALOF
+[1] -0.0382644972807468
+
+> lower_centered_pi_ratio_cutoff_FTELALOF
+[1] -0.503709057877071
+
+> upper_centered_pi_ratio_cutoff_FTELALOF
+[1] 0.463344111759402
+```
+
+```r
 # then combine with fst outlier dataframe
 q99_outlier_all_metrics_FTELALOF <- FTELALOF_fst_outliers_q99 %>% 
   select(pop1, pop2, chromosome, window_pos_1, window_pos_2, window_id, comparison, no_snps, avg_hudson_fst) %>% 
@@ -6611,7 +6672,8 @@ q99_outlier_all_metrics_FTELALOF <- FTELALOF_fst_outliers_q99 %>%
                      no_sites_tajimad_ALOF = no_sites),
             by = "window_id") %>% 
   mutate(delta_pi = avg_pi_FTEL - avg_pi_ALOF) %>% 
-  mutate(delta_td = tajima_d_FTEL - tajima_d_ALOF)
+  mutate(delta_td = tajima_d_FTEL - tajima_d_ALOF) %>% 
+  mutate(log_pi_ratio_centered = log2(avg_pi_FTEL/avg_pi_ALOF - median_log2_pi_ratio_FTELALOF))
 ```
 
 ```r
@@ -6643,7 +6705,8 @@ FTELALOF_all_metrics <- FTEL_ALOF_comp %>%
                      no_sites_tajimad_ALOF = no_sites),
             by = "window_id") %>% 
   mutate(delta_pi = avg_pi_FTEL - avg_pi_ALOF) %>% 
-  mutate(delta_td = tajima_d_FTEL - tajima_d_ALOF)
+  mutate(delta_td = tajima_d_FTEL - tajima_d_ALOF) %>% 
+  mutate(log_pi_ratio_centered = log2(avg_pi_FTEL/avg_pi_ALOF - median_log2_pi_ratio_FTELALOF))
 ```
 
 ```
@@ -6667,11 +6730,13 @@ p2_q99 <- ggplot() +
   geom_point(data = q99_outlier_all_metrics_FTELALOF, aes(x = avg_pi_ALOF, y = avg_hudson_fst), color = "red") +
   theme_bw()
 
-# fst vs delta_pi
+# fst vs centered log pi ratio
 p3_q99 <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_point(data = FTELALOF_all_metrics, aes(x = delta_pi, y = avg_hudson_fst), alpha = 0.5) +
-  geom_point(data = q99_outlier_all_metrics_FTELALOF, aes(x = delta_pi, y = avg_hudson_fst), color = "red") +
+  geom_vline(xintercept = lower_centered_pi_ratio_cutoff_FTELALOF, linetype = "dashed", linewidth = 0.25, color = "steelblue") +
+  geom_vline(xintercept = upper_centered_pi_ratio_cutoff_FTELALOF, linetype = "dashed", linewidth = 0.25, color = "steelblue") +
+  geom_point(data = FTELALOF_all_metrics, aes(x = log_pi_ratio_centered, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q99_outlier_all_metrics_FTELALOF, aes(x = log_pi_ratio_centered, y = avg_hudson_fst), color = "red") +
   theme_bw()
 
 # fst vs FTEL tajimad
@@ -6705,20 +6770,20 @@ p7_q99 <- ggplot() +
 ```r
 plot_grid(p0_q99, p1_q99, p2_q99, p3_q99, nrow = 2)
 ```
-![alt text](image-134.png)
+![alt text](image-161.png)
 
 Interpretation:
 - Fst vs. no_snps - highest Fst windows have lower SNP counts, but overall outliers are pretty evenly spread across SNP count range.
 - Fst vs. pi_FTEL - mixed bag; some outliers have reduced nucleotide diversity, but no general trend towards low pi that you would expect if there was a strong selective sweep driving Fst outliers. Outlier windows have mostly low-moderate pi, and none fall among the highest-pi windows.
 - Fst vs. pi_ALOF - similar to pi for FTEL; mixed bag.
-- Fst vs. delta_pi - outlier windows are both positive and negative, so elevated Fst is not being driven by reductions in diversity in one site or another. If high-FST windows were mainly being driven by location-specific selective sweeps, we would expect most of them to have lower pi in one location over another.
+- Fst vs. centered log2 pi ratio - outlier windows are both positive and negative, so elevated Fst is not being driven by reductions in diversity in one site or another. If high-FST windows were mainly being driven by location-specific selective sweeps, we would expect most of them to have lower pi in one location over another. Dashed blue lines represent q05 and q95 quantiles.
 
 <br>
 
 ```r
 plot_grid(p7_q99, p4_q99, p5_q99, p6_q99, nrow = 2)
 ```
-![alt text](image-135.png)
+![alt text](image-162.png)
 
 Interpretation:
 - Fst vs. dxy - highest Fst windows are mostly at low to moderate Dxy, not concentrated at the extreme highest Dxy values. If there were deep absolute divergence between the two sites in these windows (e.g., from prolonged isolation, restricted gene flow), we'd expect to see outlier windows with high Fst and high Dxy. We don't see that here.
