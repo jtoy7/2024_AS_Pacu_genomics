@@ -7085,7 +7085,7 @@ A few regions stand out as the most promising sweep candidates:
 - NC_089315.1_28770001-28780000 (one q999 window; high FST, negative delta pi, negative delta TD)
 - NC_089312.1_15300001-15310000 (high FST, positive delta pi, positive delta TD (negative ALOF TD))
 - NC_089312.1_16600001-16700000 (100 kb region with 6 q99 windows, generally elevated log pi ratio, generally elevated delta_D, generally negative ALOF Tajima's D)
-    - no q999 windows, but clear peak that maxes out just below q999 cutoff (highest window NC_089312.1_16640001_16650000) has Fst = 0.21976854)
+    - no q999 windows, but clear peak that maxes out just below q999 cutoff (highest window NC_089312.1_16640001_16650000) has Fst = 0.220)
 - NC_089313.1_18110001-18250000 (140 kb region, 1 q999 window plus 9 additional q00 windows, mixed log pi ratio, elevated delta_D, peak at q999 window interestingly has elevated dxy)
 - Two of the highest FST outliers are also adjacent windows on chromosome NC_089319.1 (7940001-7960000), but they do not exhibit as clean of a sweep pattern in delta pi and delta TD. Delta pi is negative, but delta TD is positive. This suggests that this peak may reflect differentiation of an older or standing haplotype, linked selection in a low-recombination region, or other local allele-frequency-spectrum effects rather than a classic sweep.
 
