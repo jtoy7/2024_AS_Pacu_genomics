@@ -6822,8 +6822,20 @@ q999_outlier_all_metrics_FTELALOF <- FTELALOF_fst_outliers_q999 %>%
                      no_sites_tajimad_ALOF = no_sites),
             by = "window_id") %>% 
   mutate(delta_pi = avg_pi_FTEL - avg_pi_ALOF) %>% 
-  mutate(delta_td = tajima_d_FTEL - tajima_d_ALOF)
+  mutate(delta_td = tajima_d_FTEL - tajima_d_ALOF) %>% 
+  mutate(log_pi_ratio_centered = log2(avg_pi_FTEL/avg_pi_ALOF - median_log2_pi_ratio_FTELALOF))  # add centered log2 pi ratio
 
+
+# calculate Tajima's D quantile cutoff
+tajimad_q10_FTEL <- quantile(FTELALOF_all_metrics$tajima_d_FTEL, probs = 0.10, na.rm = TRUE, names = FALSE)
+tajimad_q10_ALOF <- quantile(FTELALOF_all_metrics$tajima_d_ALOF, probs = 0.10, na.rm = TRUE, names = FALSE)
+```
+```
+> tajimad_q10_FTEL
+[1] -1.20524015126757
+
+> tajimad_q10_ALOF
+[1] -1.42941198622717
 ```
 
 <br>
@@ -6841,24 +6853,30 @@ p0_q999 <- ggplot() +
 p1_q999 <- ggplot() +
   geom_point(data = FTELALOF_all_metrics, aes(x = avg_pi_FTEL, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = avg_pi_FTEL, y = avg_hudson_fst), color = "red") +
+  geom_vline(xintercept = 0.00184, color = "black", linetype = "dashed") +   # add line for population median pi
   theme_bw()
 
 # fst vs ALOF pi
 p2_q999 <- ggplot() +
   geom_point(data = FTELALOF_all_metrics, aes(x = avg_pi_ALOF, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = avg_pi_ALOF, y = avg_hudson_fst), color = "red") +
+  geom_vline(xintercept = 0.00190, color = "black", linetype = "dashed") +   # add line for population median pi
   theme_bw()
 
-# fst vs delta_pi
+# fst vs centered log pi ratio
 p3_q999 <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_point(data = FTELALOF_all_metrics, aes(x = delta_pi, y = avg_hudson_fst), alpha = 0.5) +
-  geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = delta_pi, y = avg_hudson_fst), color = "red") +
+  geom_vline(xintercept = lower_centered_pi_ratio_cutoff_FTELALOF, linetype = "dashed", color = "steelblue", linewidth = 0.25) +
+  geom_vline(xintercept = upper_centered_pi_ratio_cutoff_FTELALOF, linetype = "dashed", color = "steelblue", linewidth = 0.25) +
+  geom_point(data = FTELALOF_all_metrics, aes(x = log_pi_ratio_centered, y = avg_hudson_fst), alpha = 0.5) +
+  geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = log_pi_ratio_centered, y = avg_hudson_fst), color = "red") +
   theme_bw()
 
 # fst vs FTEL tajimad
 p4_q999 <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = median(FTELALOF_all_metrics$tajima_d_FTEL, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_vline(xintercept = tajimad_q10_FTEL, linetype = "dashed", color = "steelblue", linewidth = 0.25) +
   geom_point(data = FTELALOF_all_metrics, aes(x = tajima_d_FTEL, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = tajima_d_FTEL, y = avg_hudson_fst), color = "red") +
   theme_bw()
@@ -6866,6 +6884,8 @@ p4_q999 <- ggplot() +
 # fst vs ALOF tajimad
 p5_q999 <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = median(FTELALOF_all_metrics$tajima_d_ALOF, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_vline(xintercept = tajimad_q10_ALOF, linetype = "dashed", color = "steelblue", linewidth = 0.25) +
   geom_point(data = FTELALOF_all_metrics, aes(x = tajima_d_ALOF, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = tajima_d_ALOF, y = avg_hudson_fst), color = "red") +
   theme_bw()
@@ -6873,37 +6893,40 @@ p5_q999 <- ggplot() +
 # fst vs delta_tajimad
 p6_q999 <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = median(FTELALOF_all_metrics$delta_td, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_point(data = FTELALOF_all_metrics, aes(x = delta_td, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = delta_td, y = avg_hudson_fst), color = "red") +
   theme_bw()
 
 # fst vs dxy
 p7_q999 <- ggplot() +
+  geom_vline(xintercept = median(FTELALOF_all_metrics$avg_dxy, na.rm = TRUE), linetype = "dashed") +
   geom_point(data = FTELALOF_all_metrics, aes(x = avg_dxy, y = avg_hudson_fst), alpha = 0.5) +
   geom_point(data = q999_outlier_all_metrics_FTELALOF, aes(x = avg_dxy, y = avg_hudson_fst), color = "red") +
   theme_bw()
 ```
 
 ```r
-plot_grid(p0_q999, p1_q999, p2_q999, p3_q999, nrow = 2)
+plot_grid(p1_q999, p0_q999, p2_q999, p3_q999, nrow = 2)
 ```
-![alt text](image-137.png)
+![alt text](image-163.png)
 
 Interpretation:
 - general patterns are similar to q99 outlier set
-- delta pi a little move negative skewed (FTEL_pi < ALOF_pi)
-- the two outliers with high FST that have the most positive/negative delta_pi are interesting, since high FST and reduced pi in one location over another can indicate directional selection in that population.
+- centered log2 pi ratio slighly more negative skewed (FTEL_pi < ALOF_pi), but there are still both negative and positive outliers
+- the outliers with high FST that have positive/negative centered log ratios beyond the q05/q95 quantiles are interesting, since high FST and reduced pi in one location over another can indicate directional selection in that population.
 
 <br>
 
 ```r
-plot_grid(p7_q999, p4_q999, p5_q999, p6_q999, nrow = 2)
+plot_grid(p4_q999, p7_q999, p5_q999, p6_q999, nrow = 2)
 ```
-![alt text](image-136.png)
+![alt text](image-164.png)
 
 Interpretation:
 - Again, general patterns are pretty similar to q99 outlier set
-- delta_td still skewed a bit positive
+- two outliers show more elevated dxy than the others
+- delta_td still skewed a bit positive, mostly because of the one extreme positive value (~2.5)
 
 <br>
 
@@ -6921,12 +6944,41 @@ cand_windows_FTELALOF <- FTELALOF_all_metrics %>%
   ) %>% 
   filter(chromosome %in% q999_outlier_all_metrics_FTELALOF$chromosome)
 
+# view all q999 candidate windows
+cand_windows_FTELALOF %>% filter(candidate_q999 == TRUE)
+```
+```
+   pop1  pop2  chromosome window_pos_1 window_pos_2 window_id comparison no_snps avg_hudson_fst avg_pi_FTEL no_sites_pi_FTEL avg_pi_ALOF no_sites_pi_ALOF avg_dxy no_sites_dxy tajima_d_FTEL no_sites_tajimad_FTEL tajima_d_ALOF no_sites_tajimad_ALOF delta_pi delta_td log_pi_ratio_centered candidate_q999 candidate_q99
+   <fct> <fct> <fct>             <dbl>        <dbl> <chr>     <fct>        <dbl>          <dbl>       <dbl>            <dbl>       <dbl>            <dbl>   <dbl>        <dbl>         <dbl>                 <dbl>         <dbl>                 <dbl>    <dbl>    <dbl>                 <dbl> <lgl>          <lgl>        
+ 1 ALOF  FTEL  NC_089312…      7910001      7920000 NC_08931… ALOF_FTEL       19          0.234    0.000353             7581    0.000308             7581 4.32e-4         7581        -0.344                  7581       -0.563                   7581  4.49e-5  0.219                 0.244   TRUE           TRUE         
+ 2 ALOF  FTEL  NC_089312…     10170001     10180000 NC_08931… ALOF_FTEL       69          0.229    0.00102              7905    0.00107              7905 1.30e-3         7905        -0.581                  7905       -0.391                   7905 -4.71e-5 -0.190                -0.00854 TRUE           TRUE         
+ 3 ALOF  FTEL  NC_089312…     15300001     15310000 NC_08931… ALOF_FTEL       31          0.232    0.000489             8204    0.000440             8204 6.05e-4         8204         0.301                  8204       -0.949                   8204  4.90e-5  1.25                  0.201   TRUE           TRUE         
+ 4 ALOF  FTEL  NC_089313…     18150001     18160000 NC_08931… ALOF_FTEL      168          0.270    0.00381              9246    0.00375              9246 5.17e-3         9246         0.277                  9246       -0.199                   9246  5.89e-5  0.476                 0.0758  TRUE           TRUE         
+ 5 ALOF  FTEL  NC_089315…     15310001     15320000 NC_08931… ALOF_FTEL      136          0.248    0.00184              8605    0.00247              8605 2.87e-3         8605        -0.404                  8605       -0.710                   8605 -6.36e-4  0.306                -0.356   TRUE           TRUE         
+ 6 ALOF  FTEL  NC_089315…     28770001     28780000 NC_08931… ALOF_FTEL      112          0.256    0.00117              9567    0.00207              9567 2.18e-3         9567        -1.64                   9567       -0.671                   9567 -8.99e-4 -0.969                -0.726   TRUE           TRUE         
+ 7 ALOF  FTEL  NC_089315…     29190001     29200000 NC_08931… ALOF_FTEL      159          0.268    0.00168              9541    0.00339              9541 3.46e-3         9541        -1.11                   9541       -0.485                   9541 -1.71e-3 -0.623                -0.904   TRUE           TRUE         
+ 8 ALOF  FTEL  NC_089315…     29230001     29240000 NC_08931… ALOF_FTEL      125          0.247    0.00136              9188    0.00237              9188 2.47e-3         9188        -0.817                  9188       -1.03                    9188 -1.01e-3  0.214                -0.706   TRUE           TRUE         
+ 9 ALOF  FTEL  NC_089315…     30530001     30540000 NC_08931… ALOF_FTEL      199          0.261    0.00328              9332    0.00389              9332 4.85e-3         9332         0.146                  9332        0.311                   9332 -6.16e-4 -0.164                -0.184   TRUE           TRUE         
+10 ALOF  FTEL  NC_089319…      7940001      7950000 NC_08931… ALOF_FTEL       62          0.293    0.00107              8085    0.00131              8085 1.62e-3         8085         0.333                  8085       -0.155                   8085 -2.35e-4  0.489                -0.220   TRUE           TRUE         
+11 ALOF  FTEL  NC_089319…      7950001      7960000 NC_08931… ALOF_FTEL       52          0.270    0.000808             7470    0.00172              7470 1.72e-3         7470         0.859                  7470        0.816                   7470 -9.08e-4  0.0430               -0.974   TRUE           TRUE         
+12 ALOF  FTEL  NC_089320…     10210001     10220000 NC_08932… ALOF_FTEL      107          0.229    0.00344              8894    0.00284              8894 4.07e-3         8894         0.907                  8894       -0.0463                  8894  6.02e-4  0.953                 0.322   TRUE           TRUE         
+13 ALOF  FTEL  NC_089320…     20880001     20890000 NC_08932… ALOF_FTEL       70          0.264    0.00134              8584    0.000107             8584 9.83e-4         8584        -0.595                  8584       -3.11                    8584  1.24e-3  2.52                  3.66    TRUE           TRUE         
+14 ALOF  FTEL  NC_089321…     18660001     18670000 NC_08932… ALOF_FTEL       50          0.231    0.000909             7537    0.00130              7537 1.44e-3         7537        -1.20                   7537       -1.19                    7537 -3.95e-4 -0.00536              -0.444   TRUE           TRUE         
+15 ALOF  FTEL  NC_089321…     18670001     18680000 NC_08932… ALOF_FTEL       15          0.280    0.000329             8920    0.000500             8920 5.72e-4         8920        -1.57                   8920       -1.29                    8920 -1.71e-4 -0.274                -0.523   TRUE           TRUE         
+16 ALOF  FTEL  NC_089322…     19110001     19120000 NC_08932… ALOF_FTEL       18          0.231    0.000321             8233    0.000272             8233 3.85e-4         8233        -1.00                   8233       -1.02                    8233  4.91e-5  0.0148                0.286   TRUE           TRUE         
+17 ALOF  FTEL  NC_089322…     19180001     19190000 NC_08932… ALOF_FTEL       28          0.234    0.000396             7478    0.000305             7478 4.59e-4         7478        -0.424                  7478       -1.20                    7478  9.10e-5  0.774                 0.418   TRUE           TRUE 
+```
+
+<br>
+
+
+```r
 # plot fst
 cand_reg_fst_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
   geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
-  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = q999_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -6935,16 +6987,18 @@ cand_reg_fst_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6,
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# plot delta_pi
-cand_reg_deltapi_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = delta_pi)) +
+# plot centered log pi ratio
+cand_reg_logpiratio_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = lower_centered_pi_ratio_cutoff_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = upper_centered_pi_ratio_cutoff_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
-    y = "Δπ"
+    y = "centered log2(π ratio)"
   ) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -6952,6 +7006,7 @@ cand_reg_deltapi_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/
 # plot delta_td
 cand_reg_deltatd_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = delta_td)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(FTELALOF_all_metrics$delta_td, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
@@ -6966,6 +7021,8 @@ cand_reg_deltatd_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/
 # plot FTEL td
 cand_reg_tdFTEL_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = tajima_d_FTEL)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(FTELALOF_all_metrics$tajima_d_FTEL, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_FTEL, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
@@ -6980,6 +7037,8 @@ cand_reg_tdFTEL_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1
 # plot ALOF td
 cand_reg_tdALOF_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = tajima_d_ALOF)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
+  geom_hline(yintercept = median(FTELALOF_all_metrics$tajima_d_ALOF, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = tajimad_q10_ALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
@@ -6993,6 +7052,7 @@ cand_reg_tdALOF_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1
 
 # plot dxy
 cand_reg_dxy_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6, y = avg_dxy)) +
+  geom_hline(yintercept = median(FTELALOF_all_metrics$avg_dxy, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_point(data = cand_windows_FTELALOF %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q99), color = "orange", alpha = 0.5, size = 1.5) +
   geom_point(data = cand_windows_FTELALOF %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
@@ -7007,7 +7067,7 @@ cand_reg_dxy_FTELALOF <- ggplot(cand_windows_FTELALOF, aes(x = window_pos_1/1e6,
 
 # combine plots
 plot_grid(cand_reg_fst_FTELALOF + labs(x = NULL),
-          cand_reg_deltapi_FTELALOF + labs(x = NULL),
+          cand_reg_logpiratio_FTELALOF + labs(x = NULL),
           cand_reg_deltatd_FTELALOF + labs(x = NULL),
           cand_reg_tdFTEL_FTELALOF + labs(x = NULL),
           cand_reg_tdALOF_FTELALOF + labs(x = NULL),
@@ -7017,13 +7077,16 @@ plot_grid(cand_reg_fst_FTELALOF + labs(x = NULL),
           axis = "lr"
 )
 ```
-![alt text](image-143.png)
+![alt text](image-165.png)
 
 A few regions stand out as the most promising sweep candidates:
 - NC_089320.1_20860001-20960000 (six q99 windows, including one q999 window; high FST, high delta pi, high delta TD (very negative ALOF TD))
 - NC_089315.1_29180001-29250000 (five q99 windows, including two q999 windows; high FST, low delta pi, lower delta TD)
 - NC_089315.1_28770001-28780000 (one q999 window; high FST, negative delta pi, negative delta TD)
 - NC_089312.1_15300001-15310000 (high FST, positive delta pi, positive delta TD (negative ALOF TD))
+- NC_089312.1_16600001-16700000 (100 kb region with 6 q99 windows, generally elevated log pi ratio, generally elevated delta_D, generally negative ALOF Tajima's D)
+    - no q999 windows, but clear peak that maxes out just below q999 cutoff (highest window NC_089312.1_16640001_16650000) has Fst = 0.21976854)
+- NC_089313.1_18110001-18250000 (140 kb region, 1 q999 window plus 9 additional q00 windows, mixed log pi ratio, elevated delta_D, peak at q999 window interestingly has elevated dxy)
 - Two of the highest FST outliers are also adjacent windows on chromosome NC_089319.1 (7940001-7960000), but they do not exhibit as clean of a sweep pattern in delta pi and delta TD. Delta pi is negative, but delta TD is positive. This suggests that this peak may reflect differentiation of an older or standing haplotype, linked selection in a low-recombination region, or other local allele-frequency-spectrum effects rather than a classic sweep.
 
 <br>
