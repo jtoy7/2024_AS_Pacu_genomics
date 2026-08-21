@@ -4768,7 +4768,7 @@ ggplot(fst_window_sum_long, aes(x = window_pos_1, y = value)) +
 ![alt text](image-110.png)
 
 
-#### Now let's zoom in on the OFU3 vs. OFU6 comparison specifically 
+### Now let's zoom in on the OFU3 vs. OFU6 comparison specifically 
 ```r
 ofu_comp <- fst_location_filt_snpfilt %>% 
   filter(str_detect(comparison, "OFU\\d_OFU\\d"))
