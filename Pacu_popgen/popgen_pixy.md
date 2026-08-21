@@ -7081,7 +7081,7 @@ plot_grid(cand_reg_fst_FTELALOF + labs(x = NULL),
 
 A few regions stand out as the most promising sweep candidates:
 - NC_089320.1_10200001-10250000 (50 Kb region, 1 q999 window plus 4 additional q99 windows; positive centered log pi ratio, high delta_D, negative ALOF tajima's D)
-- NC_089320.1_20860001-20960000 (six q99 windows, including one q999 window; high FST, high delta pi, high delta TD (very negative ALOF TD))
+- NC_089320.1_20810001-20960000 (seven q99 windows, including one q999 window; high FST, high delta pi, high delta TD (very negative ALOF TD))
 - NC_089315.1_15310001_15350000 (40 Kb region with 1 q999 window and two additional q99 windows; negative centered log pi ratio, delta_D around median or below, FTEL TD negative and below median, ALOF TD mixed with q99 window below median)
 - NC_089315.1_29180001-29250000 (five q99 windows, including two q999 windows; high FST, low delta pi, lower delta TD)
 - NC_089315.1_28770001-28780000 (one q999 window; high FST, negative delta pi, negative delta TD)
@@ -7698,9 +7698,6 @@ ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome
 ![alt text](image-170.png)
 
 
-
-
-
 <br>
 <br>
 
@@ -7788,3 +7785,52 @@ Interestingly, there are also a few developmental/regulatory genes in this regio
 
 The adjacent q999 windows on NC_089319.1 overlap BRAT1-like and FLII-like, with the second window falling entirely within FLII-like. This supports an FTEL–ALOF differentiated haplotype involving genes associated with DNA-damage response and actin/cytoskeletal regulation. However, Tajima’s D is positive at these windows for both FTEL and ALOF so the signal does not resemble a simple recent hard sweep.
 
+
+
+### Compare candidate windows from OFU3/OFU6 comparison and FTEL/ALOF comparison to see if any overlap
+```r
+# compare q99 windows from OFU3/OFU6 comparison and FTEL/ALOF comparison to see if there are any overlaps
+shared_windows_q99 <- intersect(
+  ofu_fst_outliers_q99$window_id,
+  FTELALOF_fst_outliers_q99$window_id
+  )
+
+shared_windows_q99
+length(shared_windows_q99)
+```
+```
+> shared_windows_q99
+[1] "NC_089324.1_12810001_12820000" "NC_089320.1_20950001_20960000" "NC_089320.1_20810001_20820000" "NC_089313.1_19140001_19150000"
+
+> length(shared_windows_q99)
+[1] 4
+```
+
+<br>
+
+```r
+# compare q999 windows from OFU3/OFU6 comparison and FTEL/ALOF comparison to see if there are any overlaps
+shared_windows_q999 <- intersect(
+  ofu_fst_outliers_q999$window_id,
+  FTELALOF_fst_outliers_q999$window_id
+)
+
+shared_windows_q999
+length(shared_windows_q999)
+```
+```
+> shared_windows_q999
+character(0)
+
+> length(shared_windows_q999)
+[1] 0
+```
+
+These two q99 windows fall within one of the large FST peaks previously identified in the FTEL/ALOF comparison:
+```
+"NC_089320.1_20950001_20960000"
+"NC_089320.1_20810001_20820000"
+```
+The identified region was:
+- NC_089320.1_20810001-20960000
+    - six q99 windows, including one q999 window; high FST, high delta pi, high delta TD (very negative ALOF TD))
