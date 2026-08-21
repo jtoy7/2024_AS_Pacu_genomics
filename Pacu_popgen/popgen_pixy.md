@@ -7193,10 +7193,10 @@ cand_windows_FTELALOF %>% filter(chromosome == "NC_089315.1" & candidate_q99 == 
 
 ```r
 # plot fst
-cand_reg_fst_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+cand_reg_fst_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1"), aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   geom_hline(yintercept = q999_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
@@ -7207,13 +7207,13 @@ cand_reg_fst_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chrom
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot centered log pi ratio
-cand_reg_logpiratio_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
+cand_reg_logpiratio_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1"), aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = lower_centered_pi_ratio_cutoff_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   geom_hline(yintercept = upper_centered_pi_ratio_cutoff_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7223,12 +7223,12 @@ cand_reg_logpiratio_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filte
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot delta_td
-cand_reg_deltatd_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = delta_td)) +
+cand_reg_deltatd_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1"), aes(x = window_pos_1/1e6, y = delta_td)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$delta_td, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7238,13 +7238,13 @@ cand_reg_deltatd_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(c
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot FTEL td
-cand_reg_FTELtd_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = tajima_d_FTEL)) +
+cand_reg_FTELtd_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1"), aes(x = window_pos_1/1e6, y = tajima_d_FTEL)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$tajima_d_FTEL, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_hline(yintercept = tajimad_q10_FTEL, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7254,13 +7254,13 @@ cand_reg_FTELtd_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(ch
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot ALOF td
-cand_reg_ALOFtd_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = tajima_d_ALOF)) +
+cand_reg_ALOFtd_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1"), aes(x = window_pos_1/1e6, y = tajima_d_ALOF)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$tajima_d_ALOF, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_hline(yintercept = tajimad_q10_ALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7270,11 +7270,11 @@ cand_reg_ALOFtd_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(ch
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot dxy
-cand_reg_dxy_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = avg_dxy)) +
+cand_reg_dxy_FTELALOF_c12_13_15 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1"), aes(x = window_pos_1/1e6, y = avg_dxy)) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$avg_dxy, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7296,17 +7296,17 @@ plot_grid(cand_reg_fst_FTELALOF_c12_13_15 + labs(x = NULL),
           axis = "lr"
 )
 ```
-![alt text](image-166.png)
+![alt text](image-182.png)
 
 <br>
 
 ```r
 # plot fst vs dxy
-ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000), aes(x = avg_dxy, y = avg_hudson_fst)) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
-  geom_text_repel(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), aes(label = window_pos_1), color = "red", alpha = 1, size = 3) +
+ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1"), aes(x = avg_dxy, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_text_repel(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome == "NC_089313.1" | chromosome == "NC_089315.1") %>% filter(candidate_q99), aes(label = window_pos_1), color = "red", alpha = 1, size = 3) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Average dxy",
@@ -7315,7 +7315,7 @@ ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089312.1" | chromosome
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-![alt text](image-167.png)
+![alt text](image-183.png)
 
 <br>
 <br>
@@ -7388,10 +7388,10 @@ cand_windows_FTELALOF %>% filter(chromosome == "NC_089320.1" & candidate_q99 == 
 Plot tracks for chromosomes NC_089319.1 & NC_089320.1:
 ```r
 # plot fst
-cand_reg_fst_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+cand_reg_fst_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1"), aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   geom_hline(yintercept = q999_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
@@ -7402,13 +7402,13 @@ cand_reg_fst_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromoso
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot centered log pi ratio
-cand_reg_logpiratio_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
+cand_reg_logpiratio_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1"), aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = lower_centered_pi_ratio_cutoff_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   geom_hline(yintercept = upper_centered_pi_ratio_cutoff_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7418,12 +7418,12 @@ cand_reg_logpiratio_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(c
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot delta_td
-cand_reg_deltatd_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = delta_td)) +
+cand_reg_deltatd_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1"), aes(x = window_pos_1/1e6, y = delta_td)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$delta_td, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7433,13 +7433,13 @@ cand_reg_deltatd_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chro
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot FTEL td
-cand_reg_FTELtd_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = tajima_d_FTEL)) +
+cand_reg_FTELtd_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1"), aes(x = window_pos_1/1e6, y = tajima_d_FTEL)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$tajima_d_FTEL, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_hline(yintercept = tajimad_q10_FTEL, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7449,13 +7449,13 @@ cand_reg_FTELtd_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chrom
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot ALOF td
-cand_reg_ALOFtd_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = tajima_d_ALOF)) +
+cand_reg_ALOFtd_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1"), aes(x = window_pos_1/1e6, y = tajima_d_ALOF)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$tajima_d_ALOF, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_hline(yintercept = tajimad_q10_ALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7465,11 +7465,11 @@ cand_reg_ALOFtd_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chrom
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot dxy
-cand_reg_dxy_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = avg_dxy)) +
+cand_reg_dxy_FTELALOF_c19_20 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1"), aes(x = window_pos_1/1e6, y = avg_dxy)) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$avg_dxy, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7491,17 +7491,17 @@ plot_grid(cand_reg_fst_FTELALOF_c19_20 + labs(x = NULL),
           axis = "lr"
 )
 ```
-![alt text](image-168.png)
+![alt text](image-184.png)
 
 <br>
 
 ```r
 # plot fst vs dxy
-ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000), aes(x = avg_dxy, y = avg_hudson_fst)) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
-  geom_text_repel(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), aes(label = window_pos_1), color = "red", alpha = 1, size = 3) +
+ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1"), aes(x = avg_dxy, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_text_repel(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome == "NC_089320.1") %>% filter(candidate_q99), aes(label = window_pos_1), color = "red", alpha = 1, size = 3) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Average dxy",
@@ -7510,6 +7510,7 @@ ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089319.1" | chromosome
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+![alt text](image-185.png)
 ![alt text](image-171.png)
 
 
@@ -7573,10 +7574,10 @@ cand_windows_FTELALOF %>% filter(chromosome == "NC_089322.1" & candidate_q99 == 
 Plot tracks:
 ```r
 # plot fst
-cand_reg_fst_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+cand_reg_fst_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1"), aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   geom_hline(yintercept = q999_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
@@ -7587,13 +7588,13 @@ cand_reg_fst_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromoso
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot centered log pi ratio
-cand_reg_logpiratio_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
+cand_reg_logpiratio_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1"), aes(x = window_pos_1/1e6, y = log_pi_ratio_centered)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = lower_centered_pi_ratio_cutoff_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
   geom_hline(yintercept = upper_centered_pi_ratio_cutoff_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7603,12 +7604,12 @@ cand_reg_logpiratio_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(c
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot delta_td
-cand_reg_deltatd_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = delta_td)) +
+cand_reg_deltatd_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1"), aes(x = window_pos_1/1e6, y = delta_td)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$delta_td, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7618,13 +7619,13 @@ cand_reg_deltatd_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chro
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot FTEL td
-cand_reg_FTELtd_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = tajima_d_FTEL)) +
+cand_reg_FTELtd_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1"), aes(x = window_pos_1/1e6, y = tajima_d_FTEL)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$tajima_d_FTEL, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_hline(yintercept = tajimad_q10_FTEL, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7634,13 +7635,13 @@ cand_reg_FTELtd_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chrom
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot ALOF td
-cand_reg_ALOFtd_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = tajima_d_ALOF)) +
+cand_reg_ALOFtd_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1"), aes(x = window_pos_1/1e6, y = tajima_d_ALOF)) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$tajima_d_ALOF, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
   geom_hline(yintercept = tajimad_q10_ALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7650,11 +7651,11 @@ cand_reg_ALOFtd_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chrom
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # plot dxy
-cand_reg_dxy_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000), aes(x = window_pos_1/1e6, y = avg_dxy)) +
+cand_reg_dxy_FTELALOF_c21_22 <- ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1"), aes(x = window_pos_1/1e6, y = avg_dxy)) +
   geom_hline(yintercept = median(FTELALOF_all_metrics$avg_dxy, na.rm = TRUE), linetype = "dashed", linewidth = 0.25) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Genomic position (Mbp)",
@@ -7676,17 +7677,17 @@ plot_grid(cand_reg_fst_FTELALOF_c21_22 + labs(x = NULL),
           axis = "lr"
 )
 ```
-![alt text](image-169.png)
+![alt text](image-186.png)
 
 <br>
 
 ```r
 # plot fst vs dxy
-ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000), aes(x = avg_dxy, y = avg_hudson_fst)) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
-  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
-  geom_text_repel(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(window_pos_1 >= 7000000) %>% filter(candidate_q99), aes(label = window_pos_1), color = "red", alpha = 1, size = 3) +
+ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1"), aes(x = avg_dxy, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_text_repel(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome == "NC_089322.1") %>% filter(candidate_q99), aes(label = window_pos_1), color = "red", alpha = 1, size = 3) +
   facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
   labs(
     x = "Average dxy",
@@ -7695,8 +7696,7 @@ ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089321.1" | chromosome
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-![alt text](image-170.png)
-
+![alt text](image-187.png)
 
 <br>
 <br>
