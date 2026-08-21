@@ -7900,6 +7900,24 @@ ggplot(cand_windows_c20, aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
 
 So this peak actually existed in the OFU3/OFU6 comparison as well (approx. NC_089320.1_20720001-20960000), but was just under the q999 threshold, which is why it wasn't investigated before. INTERESTING!
 
+```r
+# plot chromosome 20 for FTEL/ALOF again for comparison
+ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089320.1"), aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089320.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089320.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089320.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_hline(yintercept = q999_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.5) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+![alt text](image-179.png)
+
+
 <br>
 <br>
 
