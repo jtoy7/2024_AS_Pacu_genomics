@@ -7835,3 +7835,159 @@ The identified region was:
 - NC_089320.1_20810001-20960000
     - 150 Kb region with seven q99 windows, including one q999 window; high FST, high delta pi, high delta TD (very negative ALOF TD)
     - This is the region that encompases the gene for mitogen-activated protein kinase kinase kinase 4, a key enzyme in the p38 and JNK environmental stress response pathways.
+
+<br>
+
+#### Let's take closer look at overlap region on chromosome NC_089320.1 in the OFU3/OFU6 comparison
+```r
+# list q99 outliers
+ofu_fst_outliers_q99 %>% 
+  select(comparison, chromosome, window_pos_1, window_pos_2, window_id, avg_hudson_fst, no_snps) %>% 
+  filter(chromosome == "NC_089320.1") %>%
+  arrange(window_pos_1)
+```
+```
+   comparison chromosome  window_pos_1 window_pos_2 window_id                     avg_hudson_fst no_snps
+   <fct>      <fct>              <dbl>        <dbl> <chr>                                  <dbl>   <dbl>
+ 1 OFU3_OFU6  NC_089320.1      8650001      8660000 NC_089320.1_8650001_8660000            0.214     128
+ 2 OFU3_OFU6  NC_089320.1      8660001      8670000 NC_089320.1_8660001_8670000            0.191     234
+ 3 OFU3_OFU6  NC_089320.1      9050001      9060000 NC_089320.1_9050001_9060000            0.267      86
+ 4 OFU3_OFU6  NC_089320.1      9190001      9200000 NC_089320.1_9190001_9200000            0.205     252
+ 5 OFU3_OFU6  NC_089320.1      9230001      9240000 NC_089320.1_9230001_9240000            0.179     236
+ 6 OFU3_OFU6  NC_089320.1      9410001      9420000 NC_089320.1_9410001_9420000            0.193     100
+ 7 OFU3_OFU6  NC_089320.1      9420001      9430000 NC_089320.1_9420001_9430000            0.179     172
+ 8 OFU3_OFU6  NC_089320.1      9460001      9470000 NC_089320.1_9460001_9470000            0.179      17
+ 9 OFU3_OFU6  NC_089320.1      9510001      9520000 NC_089320.1_9510001_9520000            0.181     160
+10 OFU3_OFU6  NC_089320.1      9540001      9550000 NC_089320.1_9540001_9550000            0.198     162
+11 OFU3_OFU6  NC_089320.1     19270001     19280000 NC_089320.1_19270001_19280000          0.187     103
+12 OFU3_OFU6  NC_089320.1     19330001     19340000 NC_089320.1_19330001_19340000          0.212     106
+13 OFU3_OFU6  NC_089320.1     19340001     19350000 NC_089320.1_19340001_19350000          0.172      79
+14 OFU3_OFU6  NC_089320.1     20720001     20730000 NC_089320.1_20720001_20730000          0.199      82
+15 OFU3_OFU6  NC_089320.1     20790001     20800000 NC_089320.1_20790001_20800000          0.195      75
+16 OFU3_OFU6  NC_089320.1     20800001     20810000 NC_089320.1_20800001_20810000          0.181      57
+17 OFU3_OFU6  NC_089320.1     20810001     20820000 NC_089320.1_20810001_20820000          0.229      23
+18 OFU3_OFU6  NC_089320.1     20820001     20830000 NC_089320.1_20820001_20830000          0.173      10
+19 OFU3_OFU6  NC_089320.1     20950001     20960000 NC_089320.1_20950001_20960000          0.252      43
+```
+
+```r
+# plot fst
+cand_windows_c20 <- ofu36_all_metrics %>% 
+  mutate(
+    candidate_q99 = 
+      chromosome == "NC_089320.1" & 
+      window_pos_1 %in% (
+        ofu_fst_outliers_q99 %>%
+          filter(chromosome == "NC_089320.1") %>%
+          pull(window_pos_1)
+      )
+  ) %>% 
+  filter(chromosome == "NC_089320.1")
+
+ggplot(cand_windows_c20, aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c20 %>% filter(!candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c20 %>% filter(candidate_q99), color = "orange", alpha = 1, size = 1.5) +
+  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+![alt text](image-172.png)
+
+So this peak actually existed in the OFU3/OFU6 comparison as well (approx. NC_089320.1_20720001-20960000), but was just under the q999 threshold, which is why it wasn't investigated before. INTERESTING!
+
+<br>
+<br>
+
+#### Check chromosome NC_089313.1 overlap window
+...in the OFU3/OFU6 comparison:
+```r
+ggplot(cand_windows_c13, aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c13 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c13 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = q99, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_vline(xintercept = 19140001/1e6, color = "orange", linetype = "dashed") +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+    ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+![alt text](image-173.png)
+
+<br>
+
+...and in the FTEL/ALOF comparison:
+```r
+ggplot(cand_windows_FTELALOF %>% filter(chromosome == "NC_089313.1"), aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089313.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089313.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF %>% filter(chromosome == "NC_089313.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_hline(yintercept = q999_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = q99_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_vline(xintercept = 19140001/1e6, color = "orange", linetype = "dashed") +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+![alt text](image-175.png)
+
+<br>
+<br>
+
+#### Check chromosome 24 overlap window
+...in the OFU3/OFU6 comparison:
+```r
+ggplot(cand_windows_c24, aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_c24 %>% filter(!candidate), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_c24 %>% filter(candidate), color = "red", alpha = 1, size = 1.5) +
+  geom_hline(yintercept = q999, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = q99, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_vline(xintercept = 12810001/1e6, color = "orange", linetype = "dashed") +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 2) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+![alt text](image-176.png)
+
+<br>
+
+...and FTEL/ALOF comparison
+```r
+cand_windows_FTELALOF_allchroms <- FTELALOF_all_metrics %>% 
+  mutate(
+    candidate_q999 = window_id %in% q999_outlier_all_metrics_FTELALOF$window_id,
+    candidate_q99 = window_id %in% q99_outlier_all_metrics_FTELALOF$window_id
+  )
+
+ggplot(cand_windows_FTELALOF_allchroms %>% filter(chromosome == "NC_089324.1"), aes(x = window_pos_1/1e6, y = avg_hudson_fst)) +
+  geom_point(data = cand_windows_FTELALOF_allchroms %>% filter(chromosome == "NC_089324.1") %>% filter(!candidate_q999 & !candidate_q99), color = "black", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF_allchroms %>% filter(chromosome == "NC_089324.1") %>% filter(candidate_q99), color = "orange", alpha = 0.3, size = 1.5) +
+  geom_point(data = cand_windows_FTELALOF_allchroms %>% filter(chromosome == "NC_089324.1") %>% filter(candidate_q999), color = "red", alpha = 1, size = 1.5) +
+  geom_hline(yintercept = q999_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_hline(yintercept = q99_FTELALOF, color = "steelblue", linetype = "dashed", linewidth = 0.25) +
+  geom_vline(xintercept = 12810001/1e6, color = "orange", linetype = "dashed") +
+  facet_wrap(~ chromosome, scales = "free_x", nrow = 1) +
+  labs(
+    x = "Genomic position (Mbp)",
+    y = "Average Hudson Fst"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+![alt text](image-178.png)
