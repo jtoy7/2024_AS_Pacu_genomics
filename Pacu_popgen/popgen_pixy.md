@@ -7833,4 +7833,5 @@ These two q99 windows fall within one of the large FST peaks previously identifi
 ```
 The identified region was:
 - NC_089320.1_20810001-20960000
-    - six q99 windows, including one q999 window; high FST, high delta pi, high delta TD (very negative ALOF TD))
+    - 150 Kb region with seven q99 windows, including one q999 window; high FST, high delta pi, high delta TD (very negative ALOF TD)
+    - This is the region that encompases the gene for mitogen-activated protein kinase kinase kinase 4, a key enzyme in the p38 and JNK environmental stress response pathways.
