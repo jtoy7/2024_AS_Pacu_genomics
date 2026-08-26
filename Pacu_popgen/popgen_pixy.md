@@ -8009,3 +8009,125 @@ ggplot(cand_windows_FTELALOF_allchroms %>% filter(chromosome == "NC_089324.1"), 
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 ![alt text](image-178.png)
+
+
+### Compare to GWAS candidate SNPs
+
+```r
+# first combine and label q99 outliers
+q99_windows <- bind_rows(
+  ofu_fst_outliers_q99 %>%
+    mutate(fst_comparison = "OFU3_OFU6"),
+  FTELALOF_fst_outliers_q99 %>%
+    mutate(fst_comparison = "FTEL_ALOF")
+  )
+```
+
+```r
+# then read in GWAS candidate SNPs
+gwas_candidates <- read.table(
+  header = TRUE,
+  na.strings = "NA",
+  text = "
+chr	ps	allele1	allele0	af	beta	se	logl_H1	l_remle	l_mle	p_lrt	q_lrt	neglog10_p_lrt	dist_from_prev_bp
+NC_089312.1	32935218	C	T	0.134	0.292	0.0646	-190	0.891	0.627	0.00000667	0.221	5.18	NA
+NC_089313.1	16422646	T	C	0.171	0.299	0.067	-190	1.76	1.47	0.0000112	0.221	4.95	NA
+NC_089313.1	16430922	A	G	0.086	-0.347	0.0779	-190	1.13	0.899	0.00000654	0.221	5.18	8276
+NC_089313.1	16431423	G	A	0.138	-0.293	0.0651	-189	1.13	0.904	0.00000537	0.221	5.27	501
+NC_089313.1	16454151	C	T	0.104	-0.361	0.082	-190	1.01	0.774	0.00000928	0.221	5.03	22728
+NC_089313.1	16454204	G	C	0.104	-0.361	0.082	-190	1.01	0.774	0.00000928	0.221	5.03	53
+NC_089313.1	16454567	G	A	0.104	-0.361	0.082	-190	1.01	0.774	0.00000928	0.221	5.03	363
+NC_089317.1	20821793	G	T	0.187	-0.304	0.0667	-189	1.21	0.99	0.00000398	0.221	5.4	NA
+NC_089317.1	24929637	C	T	0.414	0.229	0.0528	-190	1.23	0.991	0.0000107	0.221	4.97	4107844
+NC_089317.1	24929771	T	G	0.414	0.229	0.0528	-190	1.23	0.991	0.0000107	0.221	4.97	134
+NC_089317.1	24950999	C	T	0.429	0.221	0.0472	-189	1.06	0.825	0.00000244	0.221	5.61	21228
+NC_089317.1	24951439	T	C	0.418	0.207	0.0482	-190	1.11	0.868	0.0000133	0.221	4.88	440
+NC_089317.1	24952099	A	G	0.362	0.249	0.0497	-187	1.05	0.819	0.000000483	0.221	6.32	660
+NC_089317.1	24953140	A	T	0.429	0.221	0.0472	-189	1.06	0.825	0.00000244	0.221	5.61	1041
+NC_089318.1	22675300	A	G	0.281	0.211	0.0476	-190	1.09	0.856	0.00000732	0.221	5.14	NA
+NC_089318.1	22676016	C	T	0.281	0.211	0.0476	-190	1.09	0.856	0.00000732	0.221	5.14	716
+NC_089319.1	6346266	T	C	0.47	0.219	0.0467	-189	0.98	0.74	0.00000261	0.221	5.58	NA
+NC_089320.1	3762279	T	C	0.482	-0.205	0.0465	-190	1.05	0.83	0.00000861	0.221	5.06	NA
+NC_089320.1	3762337	A	G	0.482	-0.205	0.0465	-190	1.05	0.83	0.00000861	0.221	5.06	58
+NC_089322.1	12717198	A	G	0.317	0.249	0.058	-190	1.21	0.98	0.000013	0.221	4.88	NA
+"
+) %>% as_tibble()
+```
+
+<br>
+
+```r
+# identify overlaps (if any)
+gwas_q99_overlap <- gwas_candidates %>%
+  inner_join(
+    q99_windows,
+    by = join_by(
+      chr == chromosome,
+      ps >= window_pos_1,
+      ps <= window_pos_2
+    ),
+    relationship = "many-to-many"
+  ) %>%
+  arrange(chr, ps, fst_comparison)
+```
+
+<br>
+
+```r
+# calculate distance to nearest q99 window
+nearest_q99 <- gwas_candidates %>%
+  select(chr, ps) %>%
+  distinct() %>%
+  inner_join(
+    q99_windows,
+    by = join_by(chr == chromosome),
+    relationship = "many-to-many"
+  ) %>%
+  mutate(
+    distance_to_q99_bp = pmax(
+      window_pos_1 - ps,
+      ps - window_pos_2,
+      0
+    )
+  ) %>%
+  group_by(chr, ps) %>%
+  slice_min(
+    distance_to_q99_bp,
+    n = 1,
+    with_ties = FALSE
+  ) %>%
+  ungroup() %>%
+  select(
+    chr,
+    ps,
+    distance_to_q99_bp,
+    nearest_q99_comparison = fst_comparison,
+    nearest_q99_window = window_id
+  )
+
+nearest_q99
+```
+```
+   chr               ps distance_to_q99_bp nearest_q99_comparison nearest_q99_window           
+   <chr>          <int>              <dbl> <chr>                  <chr>                        
+ 1 NC_089312.1 32935218             184783 OFU3_OFU6              NC_089312.1_33120001_33130000
+ 2 NC_089313.1 16422646              57355 FTEL_ALOF              NC_089313.1_16480001_16490000
+ 3 NC_089313.1 16430922              49079 FTEL_ALOF              NC_089313.1_16480001_16490000
+ 4 NC_089313.1 16431423              48578 FTEL_ALOF              NC_089313.1_16480001_16490000
+ 5 NC_089313.1 16454151              25850 FTEL_ALOF              NC_089313.1_16480001_16490000
+ 6 NC_089313.1 16454204              25797 FTEL_ALOF              NC_089313.1_16480001_16490000
+ 7 NC_089313.1 16454567              25434 FTEL_ALOF              NC_089313.1_16480001_16490000
+ 8 NC_089317.1 20821793              68208 OFU3_OFU6              NC_089317.1_20890001_20900000
+ 9 NC_089317.1 24929637             539637 OFU3_OFU6              NC_089317.1_24380001_24390000
+10 NC_089317.1 24929771             539771 OFU3_OFU6              NC_089317.1_24380001_24390000
+11 NC_089317.1 24950999             560999 OFU3_OFU6              NC_089317.1_24380001_24390000
+12 NC_089317.1 24951439             561439 OFU3_OFU6              NC_089317.1_24380001_24390000
+13 NC_089317.1 24952099             562099 OFU3_OFU6              NC_089317.1_24380001_24390000
+14 NC_089317.1 24953140             563140 OFU3_OFU6              NC_089317.1_24380001_24390000
+15 NC_089318.1 22675300            1384701 OFU3_OFU6              NC_089318.1_24060001_24070000
+16 NC_089318.1 22676016            1383985 OFU3_OFU6              NC_089318.1_24060001_24070000
+17 NC_089319.1  6346266            1593735 FTEL_ALOF              NC_089319.1_7940001_7950000  
+18 NC_089320.1  3762279              32279 FTEL_ALOF              NC_089320.1_3720001_3730000  
+19 NC_089320.1  3762337              32337 FTEL_ALOF              NC_089320.1_3720001_3730000  
+20 NC_089322.1 12717198            1512803 FTEL_ALOF              NC_089322.1_14230001_14240000
+```
