@@ -8131,3 +8131,171 @@ nearest_q99
 19 NC_089320.1  3762337              32337 FTEL_ALOF              NC_089320.1_3720001_3730000  
 20 NC_089322.1 12717198            1512803 FTEL_ALOF              NC_089322.1_14230001_14240000
 ```
+
+<br>
+<br>
+
+### Write candidate tables and create more interpretable tables
+
+Write candidate lists and corresponding metrics to tsv files:
+```r
+# FTEL-ALOF
+cand_table_FTELALOF <- cand_windows_FTELALOF_allchroms %>% filter(candidate_q99 == TRUE)
+
+write_tsv(cand_table_FTELALOF, file = "/archive/barshis/barshislab/jtoy/pver_gwas/hologenome_mapped_all/pixy/FTEL-ALOF_FST_candidate_windows.tsv")
+```
+```r
+# OFU3-OFU6
+cand_windows_OFU36_allchroms <- ofu36_all_metrics %>% 
+  mutate(
+    candidate_q999 = window_id %in% q999_outlier_all_metrics$window_id,
+    candidate_q99 = window_id %in% q99_outlier_all_metrics$window_id
+  )
+
+cand_table_OFU36 <- cand_windows_OFU36_allchroms %>% filter(candidate_q99 == TRUE)
+
+write_tsv(cand_table_OFU36, file = "/archive/barshis/barshislab/jtoy/pver_gwas/hologenome_mapped_all/pixy/OFU3-OFU6_FST_candidate_windows.tsv")
+```
+
+Now incorporate cutoffs into these tables to make them more easily interpretable:
+```r
+# FTEL vs ALOF
+# calculate median cutoffs for Tajima's D
+tajimad_med_FTEL <- median(FTELALOF_all_metrics$tajima_d_FTEL, na.rm = TRUE)
+tajimad_med_ALOF <- median(FTELALOF_all_metrics$tajima_d_ALOF, na.rm = TRUE)
+
+
+cand_table_FTELALOF_categories <- cand_table_FTELALOF %>% 
+  mutate(
+    pi_ratio_category = case_when(
+      is.na(log_pi_ratio_centered) ~ NA_character_,
+      log_pi_ratio_centered < lower_centered_pi_ratio_cutoff_FTELALOF ~ "negative q90",
+      log_pi_ratio_centered > upper_centered_pi_ratio_cutoff_FTELALOF ~ "positive q90",
+      log_pi_ratio_centered == 0 ~ "median",
+      log_pi_ratio_centered < 0 ~ "negative",
+      log_pi_ratio_centered > 0 ~ "positive"
+    ) %>% 
+      as.factor(),
+    FTEL_td_category = case_when(
+      is.na(tajima_d_FTEL) ~ NA_character_,
+      tajima_d_FTEL < tajimad_q10_FTEL ~ "negative q90",
+      tajima_d_FTEL < tajimad_med_FTEL ~ "negative q50",
+      tajima_d_FTEL < 0 ~ "negative",
+      tajima_d_FTEL == 0 ~ "zero",
+      tajima_d_FTEL > 0 ~ "positive"
+    ) %>% 
+      as.factor(),
+    ALOF_td_category = case_when(
+      is.na(tajima_d_ALOF) ~ NA_character_,
+      tajima_d_ALOF < tajimad_q10_ALOF ~ "negative q90",
+      tajima_d_ALOF < tajimad_med_ALOF ~ "negative q50",
+      tajima_d_ALOF < 0 ~ "negative",
+      tajima_d_ALOF == 0 ~ "zero",
+      tajima_d_ALOF > 0 ~ "positive"
+    ) %>% 
+      as.factor()
+  ) %>% 
+  select(comparison, chromosome, window_pos_1, window_pos_2, no_snps, avg_hudson_fst, candidate_q999, candidate_q99, log_pi_ratio_centered, pi_ratio_category, tajima_d_FTEL, FTEL_td_category, tajima_d_ALOF, ALOF_td_category, delta_td, avg_dxy)
+```
+```r
+# write file
+write_tsv(cand_table_FTELALOF_categories, file = "/archive/barshis/barshislab/jtoy/pver_gwas/hologenome_mapped_all/pixy/FTEL-ALOF_FST_candidate_windows_categorized.tsv")
+```
+
+Showing only the q999 entries:
+```r
+cand_table_FTELALOF_categories %>% filter(candidate_q999 == TRUE)
+```
+| comparison | chromosome  | window_pos_1 | window_pos_2 | no_snps | avg_hudson_fst | candidate_q999 | candidate_q99 | log_pi_ratio_centered | pi_ratio_category | tajima_d_FTEL | FTEL_td_category | tajima_d_ALOF | ALOF_td_category | delta_td | avg_dxy  |
+|------------|-------------|--------------|--------------|---------|----------------|----------------|---------------|-----------------------|-------------------|---------------|------------------|---------------|------------------|----------|----------|
+| <fct>      | <fct>       | <dbl>        | <dbl>        | <dbl>   | <dbl>          | <lgl>          | <lgl>         | <dbl>                 | <fct>             | <dbl>         | <fct>            | <dbl>         | <fct>            | <dbl>    | <dbl>    |
+| ALOF_FTEL  | NC_089312.1 | 7910001      | 7920000      | 19      | 0.234          | TRUE           | TRUE          | 0.244                 | positive          | -0.344        | negative_q50     | -0.563        | negative_q50     | 0.219    | 0.000432 |
+| ALOF_FTEL  | NC_089312.1 | 10170001     | 10180000     | 69      | 0.229          | TRUE           | TRUE          | -0.00854              | negative          | -0.581        | negative_q50     | -0.391        | negative         | -0.19    | 0.0013   |
+| ALOF_FTEL  | NC_089312.1 | 15300001     | 15310000     | 31      | 0.232          | TRUE           | TRUE          | 0.201                 | positive          | 0.301         | positive         | -0.949        | negative_q50     | 1.25     | 0.000605 |
+| ALOF_FTEL  | NC_089313.1 | 18150001     | 18160000     | 168     | 0.27           | TRUE           | TRUE          | 0.0758                | positive          | 0.277         | positive         | -0.199        | negative         | 0.476    | 0.00517  |
+| ALOF_FTEL  | NC_089315.1 | 15310001     | 15320000     | 136     | 0.248          | TRUE           | TRUE          | -0.356                | negative          | -0.404        | negative_q50     | -0.71         | negative_q50     | 0.306    | 0.00287  |
+| ALOF_FTEL  | NC_089315.1 | 28770001     | 28780000     | 112     | 0.256          | TRUE           | TRUE          | -0.726                | negative_q90      | -1.64         | negative_q90     | -0.671        | negative_q50     | -0.969   | 0.00218  |
+| ALOF_FTEL  | NC_089315.1 | 29190001     | 29200000     | 159     | 0.268          | TRUE           | TRUE          | -0.904                | negative_q90      | -1.11         | negative_q50     | -0.485        | negative         | -0.623   | 0.00346  |
+| ALOF_FTEL  | NC_089315.1 | 29230001     | 29240000     | 125     | 0.247          | TRUE           | TRUE          | -0.706                | negative_q90      | -0.817        | negative_q50     | -1.03         | negative_q50     | 0.214    | 0.00247  |
+| ALOF_FTEL  | NC_089315.1 | 30530001     | 30540000     | 199     | 0.261          | TRUE           | TRUE          | -0.184                | negative          | 0.146         | positive         | 0.311         | positive         | -0.164   | 0.00485  |
+| ALOF_FTEL  | NC_089319.1 | 7940001      | 7950000      | 62      | 0.293          | TRUE           | TRUE          | -0.22                 | negative          | 0.333         | positive         | -0.155        | negative         | 0.489    | 0.00162  |
+| ALOF_FTEL  | NC_089319.1 | 7950001      | 7960000      | 52      | 0.27           | TRUE           | TRUE          | -0.974                | negative_q90      | 0.859         | positive         | 0.816         | positive         | 0.043    | 0.00172  |
+| ALOF_FTEL  | NC_089320.1 | 10210001     | 10220000     | 107     | 0.229          | TRUE           | TRUE          | 0.322                 | positive          | 0.907         | positive         | -0.0463       | negative         | 0.953    | 0.00407  |
+| ALOF_FTEL  | NC_089320.1 | 20880001     | 20890000     | 70      | 0.264          | TRUE           | TRUE          | 3.66                  | positive_q90      | -0.595        | negative_q50     | -3.11         | negative_q90     | 2.52     | 0.000983 |
+| ALOF_FTEL  | NC_089321.1 | 18660001     | 18670000     | 50      | 0.231          | TRUE           | TRUE          | -0.444                | negative          | -1.2          | negative_q50     | -1.19         | negative_q50     | -0.00536 | 0.00144  |
+| ALOF_FTEL  | NC_089321.1 | 18670001     | 18680000     | 15      | 0.28           | TRUE           | TRUE          | -0.523                | negative_q90      | -1.57         | negative_q90     | -1.29         | negative_q50     | -0.274   | 0.000572 |
+| ALOF_FTEL  | NC_089322.1 | 19110001     | 19120000     | 18      | 0.231          | TRUE           | TRUE          | 0.286                 | positive          | -1            | negative_q50     | -1.02         | negative_q50     | 0.0148   | 0.000385 |
+| ALOF_FTEL  | NC_089322.1 | 19180001     | 19190000     | 28      | 0.234          | TRUE           | TRUE          | 0.418                 | positive          | -0.424        | negative_q50     | -1.2          | negative_q50     | 0.774    | 0.000459 |
+
+<br>
+
+```r
+# OFU3 vs OFU6
+# calculate median cutoffs for Tajima's D
+tajimad_med_OFU3 <- median(ofu36_all_metrics$tajima_d_OFU3, na.rm = TRUE)
+tajimad_med_OFU6 <- median(ofu36_all_metrics$tajima_d_OFU6, na.rm = TRUE)
+
+
+cand_table_OFU36_categories <- cand_table_OFU36 %>% 
+  mutate(
+    pi_ratio_category = case_when(
+      is.na(log_pi_ratio_centered) ~ NA_character_,
+      log_pi_ratio_centered < lower_centered_pi_ratio_cutoff_OFU36 ~ "negative_q90",
+      log_pi_ratio_centered > upper_centered_pi_ratio_cutoff_OFU36 ~ "positive_q90",
+      log_pi_ratio_centered == 0 ~ "median",
+      log_pi_ratio_centered < 0 ~ "negative",
+      log_pi_ratio_centered > 0 ~ "positive"
+    ) %>% 
+      as.factor(),
+    OFU3_td_category = case_when(
+      is.na(tajima_d_OFU3) ~ NA_character_,
+      tajima_d_OFU3 < tajimad_q10_OFU3 ~ "negative_q90",
+      tajima_d_OFU3 < tajimad_med_OFU3 ~ "negative_q50",
+      tajima_d_OFU3 < 0 ~ "negative",
+      tajima_d_OFU3 == 0 ~ "zero",
+      tajima_d_OFU3 > 0 ~ "positive"
+    ) %>% 
+      as.factor(),
+    OFU6_td_category = case_when(
+      is.na(tajima_d_OFU6) ~ NA_character_,
+      tajima_d_OFU6 < tajimad_q10_OFU6 ~ "negative_q90",
+      tajima_d_OFU6 < tajimad_med_OFU6 ~ "negative_q50",
+      tajima_d_OFU6 < 0 ~ "negative",
+      tajima_d_OFU6 == 0 ~ "zero",
+      tajima_d_OFU6 > 0 ~ "positive"
+    ) %>% 
+      as.factor()
+  ) %>% 
+  select(comparison, chromosome, window_pos_1, window_pos_2, no_snps, avg_hudson_fst, candidate_q999, candidate_q99, log_pi_ratio_centered, pi_ratio_category, tajima_d_OFU3, OFU3_td_category, tajima_d_OFU6, OFU6_td_category, delta_td, avg_dxy)
+```
+
+```r
+# write file
+write_tsv(cand_table_OFU36_categories, file = "/archive/barshis/barshislab/jtoy/pver_gwas/hologenome_mapped_all/pixy/OFU3-OFU6_FST_candidate_windows_categorized.tsv")
+```
+
+Showing only the q999 entries:
+```r
+cand_table_OFU36_categories %>% filter(candidate_q999 == TRUE) %>% arrange(chromosome, window_pos_1)
+```
+
+| comparison | chromosome  | window_pos_1 | window_pos_2 | no_snps | avg_hudson_fst | candidate_q999 | candidate_q99 | log_pi_ratio_centered | pi_ratio_category | tajima_d_OFU3 | OFU3_td_category | tajima_d_OFU6 | OFU6_td_category | delta_td | avg_dxy  |
+|------------|-------------|--------------|--------------|---------|----------------|----------------|---------------|-----------------------|-------------------|---------------|------------------|---------------|------------------|----------|----------|
+| <fct>      | <fct>       | <dbl>        | <dbl>        | <dbl>   | <dbl>          | <lgl>          | <lgl>         | <dbl>                 | <fct>             | <dbl>         | <fct>            | <dbl>         | <fct>            | <dbl>    | <dbl>    |
+| OFU3_OFU6  | NC_089312.1 | 34680001     | 34690000     | 70      | 0.506          | TRUE           | TRUE          | -0.604                | negative_q90      | -1.22         | negative_q50     | -0.18         | negative         | -1.04    | 0.00312  |
+| OFU3_OFU6  | NC_089312.1 | 34690001     | 34700000     | 67      | 0.521          | TRUE           | TRUE          | -0.812                | negative_q90      | -1.3          | negative_q50     | 0.199         | positive         | -1.5     | 0.00382  |
+| OFU3_OFU6  | NC_089312.1 | 34700001     | 34710000     | 47      | 0.486          | TRUE           | TRUE          | -1.11                 | negative_q90      | -2.01         | negative_q90     | -0.722        | negative         | -1.29    | 0.00209  |
+| OFU3_OFU6  | NC_089312.1 | 34710001     | 34720000     | 93      | 0.332          | TRUE           | TRUE          | -1.11                 | negative_q90      | -1.77         | negative_q90     | 0.0599        | positive         | -1.83    | 0.00341  |
+| OFU3_OFU6  | NC_089312.1 | 36050001     | 36060000     | 24      | 0.276          | TRUE           | TRUE          | -0.384                | negative          | -0.725        | negative_q50     | 0.0963        | positive         | -0.821   | 0.000531 |
+| OFU3_OFU6  | NC_089313.1 | 3680001      | 3690000      | 32      | 0.566          | TRUE           | TRUE          | 0.867                 | positive_q90      | 0.787         | positive         | -0.99         | negative_q50     | 1.78     | 0.00121  |
+| OFU3_OFU6  | NC_089313.1 | 17880001     | 17890000     | 53      | 0.28           | TRUE           | TRUE          | 1.12                  | positive_q90      | -0.0895       | negative         | -1.27         | negative_q50     | 1.18     | 0.00103  |
+| OFU3_OFU6  | NC_089315.1 | 1740001      | 1750000      | 65      | 0.326          | TRUE           | TRUE          | -0.394                | negative          | -1.37         | negative_q90     | 0.251         | positive         | -1.63    | 0.00179  |
+| OFU3_OFU6  | NC_089315.1 | 21190001     | 21200000     | 59      | 0.387          | TRUE           | TRUE          | -0.104                | negative          | 0.215         | positive         | -0.648        | negative         | 0.863    | 0.00251  |
+| OFU3_OFU6  | NC_089315.1 | 21220001     | 21230000     | 30      | 0.404          | TRUE           | TRUE          | 0.587                 | positive          | 0.841         | positive         | -1.4          | negative_q50     | 2.24     | 0.00142  |
+| OFU3_OFU6  | NC_089315.1 | 21230001     | 21240000     | 135     | 0.312          | TRUE           | TRUE          | 0.307                 | positive          | 0.807         | positive         | -0.485        | negative         | 1.29     | 0.00586  |
+| OFU3_OFU6  | NC_089315.1 | 21600001     | 21610000     | 117     | 0.315          | TRUE           | TRUE          | 0.551                 | positive          | 0.733         | positive         | -1.17         | negative_q50     | 1.9      | 0.0045   |
+| OFU3_OFU6  | NC_089315.1 | 21610001     | 21620000     | 118     | 0.339          | TRUE           | TRUE          | 0.499                 | positive          | 1.29          | positive         | -0.549        | negative         | 1.84     | 0.00478  |
+| OFU3_OFU6  | NC_089315.1 | 24370001     | 24380000     | 37      | 0.298          | TRUE           | TRUE          | 0.944                 | positive_q90      | 1.29          | positive         | -1.36         | negative_q50     | 2.65     | 0.00138  |
+| OFU3_OFU6  | NC_089315.1 | 24380001     | 24390000     | 96      | 0.271          | TRUE           | TRUE          | 0.889                 | positive_q90      | -0.413        | negative_q50     | -1.83         | negative_q90     | 1.41     | 0.00307  |
+| OFU3_OFU6  | NC_089318.1 | 24190001     | 24200000     | 100     | 0.271          | TRUE           | TRUE          | -0.581                | negative_q90      | -1.22         | negative_q50     | 0.206         | positive         | -1.43    | 0.00269  |
+| OFU3_OFU6  | NC_089324.1 | 12810001     | 12820000     | 46      | 0.288          | TRUE           | TRUE          | 1.38                  | positive_q90      | 1.75          | positive         | -1.47         | negative_q50     | 3.22     | 0.00123  |
